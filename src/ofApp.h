@@ -56,6 +56,7 @@ public:
     ofParameter<float> materialShininess;
     // - world
     ofParameter<ofVec3f> worldGravity;
+    ofParameter<ofVec3f> modelStartPosition;
     // - reset
     ofxButton reset;
     

@@ -95,9 +95,14 @@ void ofApp::setupWhenKinectIsReady(){
     int h = rawDepthPixels.getHeight();
     int d = (int)kinect.maxDistance.getMax();
     // gui
+    // light
     panel.add(lightPosition.set("lightPosition", ofVec3f(w/2.0, h/2.0, kinect.minDistance/2.0), ofVec3f(0, 0, -d), ofVec3f(w, h, d)));
+    // - camera
     panel.add(cameraPosition.set("cameraPosition", ofVec3f(w/2.0, h/2.0, 0), ofVec3f(0, 0, -d), ofVec3f(w, h, d)));
     panel.add(cameraLookAt.set("cameraLookAt", ofVec3f(w/2.0, h/2.0, kinect.minDistance), ofVec3f(0, 0, -d), ofVec3f(w, h, d)));
+    // - world
+    panel.add(modelStartPosition.set("modelStartPosition", ofVec3f(cameraPosition), cameraPosition.getMin(), cameraPosition.getMax()));
+    // - gui
     panel.loadFromFile("settings.xml");
     panel.minimizeAll();
     
@@ -352,7 +357,7 @@ void ofApp::keyPressed(int key){
             bulletCustomShape = new ofxBulletCustomShape;
             ofQuaternion startRot = ofQuaternion(1., 0., 0., PI);
             bulletCustomShape->init((btCompoundShape*)assimpModelBulletShapes[0]->getCollisionShape(), assimpModelBulletShapes[0]->getCentroid());
-            bulletCustomShape->create(world.world, camera.getPosition()+30.0f*camera.getLookAtDir(), startRot, 0.000005);
+            bulletCustomShape->create(world.world, modelStartPosition, startRot, 0.000005);
             bulletCustomShape->add();
             ofVec3f frc(camera.getLookAtDir());
             frc.normalize();
