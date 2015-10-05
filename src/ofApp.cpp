@@ -28,6 +28,7 @@ void ofApp::setup(){
     // - world
     panel.add(worldGravity.set("worldGravity", ofVec3f(0, 0, 15.0), ofVec3f(-100, -100, -100), ofVec3f(100, 100, 100)));
     panel.add(modelMass.set("modelMass", 0.000005, 0.000005, 1)); // 1 is 1 kg
+    panel.add(enableAddModel.set("enableAddModel", false));
     // - light
     panel.add(lightSpecularColor.set("lightSpecularColor", ofFloatColor::red, ofFloatColor::black, ofFloatColor::white));
     panel.add(lightDissuseColor.set("lightDiffuseColor", ofFloatColor::green, ofFloatColor::black, ofFloatColor::white));
@@ -193,15 +194,33 @@ void ofApp::update(){
         setupWhenKinectIsReady();
     }
     
+    // kinect
     if (h != 0 && kinectBulletShape != NULL) {
         kinectBulletShape->remove();
         kinectBulletShape->create( world.world, kinectMesh, ofVec3f(0,0,0), 0.f, ofVec3f(0, 0, 0), ofVec3f(w, h, kinect.maxDistance.getMax()) );
         kinectBulletShape->add();
         kinectBulletShape->enableKinematic();
         kinectBulletShape->setActivationState( DISABLE_DEACTIVATION );
-        world.setGravity(worldGravity);
-        world.update(ofGetLastFrameTime()*2, 20);
     }
+    
+    // model
+    if (enableAddModel) {
+        // add model
+        ofxBulletCustomShape *bulletCustomShape;
+        bulletCustomShape = new ofxBulletCustomShape;
+        ofQuaternion startRot = ofQuaternion(1., 0., 0., PI);
+        bulletCustomShape->init((btCompoundShape*)assimpModelBulletShapes[0]->getCollisionShape(), assimpModelBulletShapes[0]->getCentroid());
+        bulletCustomShape->create(world.world, modelStartPosition, startRot, modelMass);
+        bulletCustomShape->add();
+        ofVec3f frc(camera.getLookAtDir());
+        frc.normalize();
+        bulletCustomShape->applyCentralForce(frc*0.005);
+        assimpModelBulletShapes.push_back(bulletCustomShape);
+    }
+    
+    // world
+    world.setGravity(worldGravity);
+    world.update(ofGetLastFrameTime()*2, 20);
     
     // camera
     if (enableMouseInput) {
