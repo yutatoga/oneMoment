@@ -1,0 +1,16 @@
+<distance_in_mm>
+	<minDistance>500</minDistance>
+	<maxDistance>1260</maxDistance>
+	<step>5</step>
+	<enableDrawDebug>1</enableDrawDebug>
+	<enableDrawWireFrame>1</enableDrawWireFrame>
+	<enableDrawGuideLine>0</enableDrawGuideLine>
+	<enableMouseInput>1</enableMouseInput>
+	<enableDrawDebugSpheres>0</enableDrawDebugSpheres>
+	<cameraPosition>256, 212, 0</cameraPosition>
+	<cameraLookAt>256, 212, 500</cameraLookAt>
+<distance_in_mm/>
+<lightSpecularColor>1, 0, 0, 1</lightSpecularColor>
+	<lightDiffuseColor>0, 1, 0, 1</lightDiffuseColor>
+	<lightAmbientColor>0, 0, 1, 1</lightAmbientColor>
+</distance_in_mm>
