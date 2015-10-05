@@ -2,15 +2,26 @@
 	<minDistance>500</minDistance>
 	<maxDistance>1260</maxDistance>
 	<step>5</step>
-	<enableDrawDebug>1</enableDrawDebug>
+	<enableDrawDebug>0</enableDrawDebug>
 	<enableDrawWireFrame>1</enableDrawWireFrame>
 	<enableDrawGuideLine>0</enableDrawGuideLine>
-	<enableMouseInput>1</enableMouseInput>
+	<enableMouseInput>0</enableMouseInput>
 	<enableDrawDebugSpheres>0</enableDrawDebugSpheres>
-	<cameraPosition>256, 212, 0</cameraPosition>
-	<cameraLookAt>256, 212, 500</cameraLookAt>
+	<cameraPosition>256, 212, 367.347</cameraPosition>
+	<cameraLookAt>256, 212, 12000</cameraLookAt>
 <distance_in_mm/>
-<lightSpecularColor>1, 0, 0, 1</lightSpecularColor>
-	<lightDiffuseColor>0, 1, 0, 1</lightDiffuseColor>
-	<lightAmbientColor>0, 0, 1, 1</lightAmbientColor>
+<lightSpecularColor>0, 0, 0, 1</lightSpecularColor>
+	<lightDiffuseColor>0, 0, 0, 1</lightDiffuseColor>
+	<lightAmbientColor>1, 1, 1, 1</lightAmbientColor>
+<worldGravity>0, 0, -15.3061</worldGravity>
+	<lightAttenuation>1, 0, 0</lightAttenuation>
+	<enableSmoothLighting>1</enableSmoothLighting>
+	<enableSeparateSpecularLight>0</enableSeparateSpecularLight>
+	<materialSpecularColor>0, 0, 0, 1</materialSpecularColor>
+	<materialDiffuseColor>0, 0, 0, 1</materialDiffuseColor>
+	<materialAmbientColor>1, 1, 1, 1</materialAmbientColor>
+	<materialEmissiveColor>0, 0, 0, 1</materialEmissiveColor>
+	<materialShininess>64</materialShininess>
+	<lightPosition>256, 212, 12000</lightPosition>
+	<modelStartPosition>256, 212, 1102.04</modelStartPosition>
 </distance_in_mm>

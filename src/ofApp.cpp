@@ -27,6 +27,7 @@ void ofApp::setup(){
     panel.add(reset.setup("reset"));
     // - world
     panel.add(worldGravity.set("worldGravity", ofVec3f(0, 0, 15.0), ofVec3f(-100, -100, -100), ofVec3f(100, 100, 100)));
+    panel.add(modelMass.set("modelMass", 0.000005, 0.000005, 1)); // 1 is 1 kg
     // - light
     panel.add(lightSpecularColor.set("lightSpecularColor", ofFloatColor::red, ofFloatColor::black, ofFloatColor::white));
     panel.add(lightDissuseColor.set("lightDiffuseColor", ofFloatColor::green, ofFloatColor::black, ofFloatColor::white));
@@ -41,6 +42,7 @@ void ofApp::setup(){
     panel.add(materialEmissiveColor.set("materialEmissiveColor", ofFloatColor::black, ofFloatColor::black, ofFloatColor::white));
     panel.add(materialShininess.set("materialShininess", 64, 0, 128));
     panel.loadFromFile("settings.xml");
+    // >> to be continued in setupWhenKinectIsReady
     
     // kinect
     kinect.open();
@@ -357,7 +359,7 @@ void ofApp::keyPressed(int key){
             bulletCustomShape = new ofxBulletCustomShape;
             ofQuaternion startRot = ofQuaternion(1., 0., 0., PI);
             bulletCustomShape->init((btCompoundShape*)assimpModelBulletShapes[0]->getCollisionShape(), assimpModelBulletShapes[0]->getCentroid());
-            bulletCustomShape->create(world.world, modelStartPosition, startRot, 0.000005);
+            bulletCustomShape->create(world.world, modelStartPosition, startRot, modelMass);
             bulletCustomShape->add();
             ofVec3f frc(camera.getLookAtDir());
             frc.normalize();

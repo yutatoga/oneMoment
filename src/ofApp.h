@@ -57,6 +57,7 @@ public:
     // - world
     ofParameter<ofVec3f> worldGravity;
     ofParameter<ofVec3f> modelStartPosition;
+    ofParameter<float> modelMass;
     // - reset
     ofxButton reset;
     
