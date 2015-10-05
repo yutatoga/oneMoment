@@ -30,7 +30,7 @@ void ofApp::setup(){
     panel.add(enableDrawDebugSpheres.set("enableDrawDebugSpheres", false));
     panel.add(reset.setup("reset"));
     // - world
-    panel.add(worldGravity.set("worldGravity", ofVec3f(0, 0, 15.0), ofVec3f(-100, -100, -100), ofVec3f(100, 100, 100)));
+    panel.add(worldGravity.set("worldGravity", ofVec3f(0, 0, 15.0), ofVec3f(-30, -30, -30), ofVec3f(30, 30, 30)));
     panel.add(modelMass.set("modelMass", 0.000005, 0.000005, 1)); // 1 is 1 kg
     panel.add(enableAddModel.set("enableAddModel", false));
     // - light
