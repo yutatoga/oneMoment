@@ -222,6 +222,18 @@ void ofApp::update(){
     world.setGravity(worldGravity);
     world.update(ofGetLastFrameTime()*2, 20);
     
+    // erase model in out range
+    for( int i = 0; i < assimpModelBulletShapes.size(); i++ ) {
+        // FIXME: can not delete assimpModelBulletShapese[0] (maybe better to use shared_ptr. check ofxBullet>SoftBodyMeshExample)
+        if (i != 0) {
+            if(assimpModelBulletShapes[i]->getPosition().z < 0) {
+                assimpModelBulletShapes[i]->remove();
+                assimpModelBulletShapes.erase(assimpModelBulletShapes.begin() + i);
+                break;
+            }
+        }
+    }
+    
     // camera
     if (enableMouseInput) {
         camera.enableMouseInput();
