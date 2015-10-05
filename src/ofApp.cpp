@@ -24,6 +24,7 @@ void ofApp::setup(){
     // - debug
     panel.add(enableDrawDebug.set("enableDrawDebug", true));
     panel.add(enableDrawWireFrame.set("enableDrawWireFrame", true));
+    panel.add(hideKinectMesh.set("hideKinectMesh", false));
     panel.add(enableDrawGuideLine.set("enableDrawGuideLine", false));
     panel.add(enableMouseInput.set("enableMouseInput", true));
     panel.add(enableDrawDebugSpheres.set("enableDrawDebugSpheres", false));
@@ -285,9 +286,11 @@ void ofApp::draw(){
                     glDisable(GL_COLOR_MATERIAL);
                     material.begin();{
                         // kinect mesh
-                        kinectMesh.setMode(OF_PRIMITIVE_TRIANGLES);
-                        glLineWidth(int(1));
-                        enableDrawWireFrame ? kinectMesh.drawWireframe() : kinectMesh.drawFaces();
+                        if (!hideKinectMesh) {
+                            kinectMesh.setMode(OF_PRIMITIVE_TRIANGLES);
+                            glLineWidth(int(1));
+                            enableDrawWireFrame ? kinectMesh.drawWireframe() : kinectMesh.drawFaces();
+                        }
                         
                         // spheres
                         for( int i = 0; i < spheres.size(); i++ ) {

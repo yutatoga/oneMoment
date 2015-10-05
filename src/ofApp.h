@@ -37,6 +37,7 @@ public:
     ofParameter<bool> stopUpdatingKinectBullet;
     ofParameter<bool> enableDrawDebug;
     ofParameter<bool> enableDrawWireFrame;
+    ofParameter<bool> hideKinectMesh;
     ofParameter<bool> enableDrawGuideLine;
     ofParameter<bool> enableMouseInput;
     ofParameter<bool> enableDrawDebugSpheres;
