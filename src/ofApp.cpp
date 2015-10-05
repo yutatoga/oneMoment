@@ -13,22 +13,28 @@ void ofApp::setup(){
     enableSmoothLighting.addListener(this, &ofApp::enableSmoothLightingChanged);
     
     // gui
+    // - kinect
     panel.setup("distance in mm", "settings.xml", 0, 0);
     panel.add(kinect.minDistance);
     panel.add(kinect.maxDistance);
     panel.add(step.set("step", 5, 3, 30));
+    // - debug
     panel.add(enableDrawDebug.set("enableDrawDebug", true));
     panel.add(enableDrawWireFrame.set("enableDrawWireFrame", true));
     panel.add(enableDrawGuideLine.set("enableDrawGuideLine", false));
     panel.add(enableMouseInput.set("enableMouseInput", true));
     panel.add(enableDrawDebugSpheres.set("enableDrawDebugSpheres", false));
     panel.add(reset.setup("reset"));
+    // - world
+    panel.add(worldGravity.set("worldGravity", ofVec3f(0, 0, 15.0), ofVec3f(-100, -100, -100), ofVec3f(100, 100, 100)));
+    // - light
     panel.add(lightSpecularColor.set("lightSpecularColor", ofFloatColor::red, ofFloatColor::black, ofFloatColor::white));
     panel.add(lightDissuseColor.set("lightDiffuseColor", ofFloatColor::green, ofFloatColor::black, ofFloatColor::white));
     panel.add(lightAmbientColor.set("lightAmbientColor", ofFloatColor::blue, ofFloatColor::black, ofFloatColor::white));
     panel.add(lightAttenuation.set("lightAttenuation", ofVec3f(1.0, 0.0, 0.0), ofVec3f(0.0, 0.0, 0.0), ofVec3f(5.0, 0.01, 0.0001)));
     panel.add(enableSmoothLighting.set("enableSmoothLighting", true));
     panel.add(enableSeparateSpecularLight.set("enableSeparateSpecularLight", false));
+    // - material
     panel.add(materialSpecularColor.set("materialSpecularColor", ofFloatColor::red, ofFloatColor::black, ofFloatColor::white));
     panel.add(materialDiffuseColor.set("materialDiffuseColor", ofFloatColor::green, ofFloatColor::black, ofFloatColor::white));
     panel.add(materialAmbientColor.set("materialAmbientColor", ofFloatColor::blue, ofFloatColor::black, ofFloatColor::white));
@@ -41,15 +47,13 @@ void ofApp::setup(){
     
     // caemera
     camera.setAutoDistance(false);
-    camera.setPosition(cameraPosition);
-    camera.lookAt(ofVec3f(0, 0, 0), ofVec3f(0, -1, 0));
     if (!enableMouseInput) camera.disableMouseInput();
     
     // bullet
     world.setup();
     world.enableGrabbing();
     world.setCamera(&camera);
-    world.setGravity(ofVec3f(0, 0, 15.0));
+    world.setGravity(worldGravity);
     
     // model
     ofVec3f scale(1.0, 1.0, 1.0);
@@ -103,7 +107,8 @@ void ofApp::setupWhenKinectIsReady(){
     
     // camera
     camera.setPosition(cameraPosition);
-    camera.lookAt(ofVec3f(cameraLookAt), ofVec3f(0, -1, 0));
+    ofVec3f upVector(0, -1, 0);
+    camera.lookAt(ofVec3f(cameraLookAt), upVector);
     
     // debug spheres
     float debugSphereRadius = 5;
@@ -187,6 +192,7 @@ void ofApp::update(){
         kinectBulletShape->add();
         kinectBulletShape->enableKinematic();
         kinectBulletShape->setActivationState( DISABLE_DEACTIVATION );
+        world.setGravity(worldGravity);
         world.update(ofGetLastFrameTime()*2, 20);
     }
     
@@ -226,6 +232,8 @@ void ofApp::draw(){
             // ofTranslate(-rawDepthPixels.getWidth()/2.0, -rawDepthPixels.getHeight()/2.0, 0);
             ofSetLineWidth(1.f);
             if(enableDrawDebug) world.drawDebug();
+            // light
+            light.draw();
             ofEnableLighting();{
                 light.enable();{
                     if (enableSeparateSpecularLight) {
@@ -233,9 +241,6 @@ void ofApp::draw(){
                     }
                     glDisable(GL_COLOR_MATERIAL);
                     material.begin();{
-                        // light
-                        light.draw();
-                        
                         // kinect mesh
                         kinectMesh.setMode(OF_PRIMITIVE_TRIANGLES);
                         glLineWidth(int(1));
@@ -277,7 +282,7 @@ void ofApp::draw(){
                     }
                 }light.disable();
             }ofDisableLighting();
-            // if(enableDrawDebug) ofDrawAxis(0.5);
+             if(enableDrawDebug) ofDrawAxis(10000);
             // }ofPopMatrix();
         }camera.end();
     }ofDisableDepthTest();

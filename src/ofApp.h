@@ -54,6 +54,8 @@ public:
     ofParameter<ofFloatColor> materialAmbientColor;
     ofParameter<ofFloatColor> materialEmissiveColor;
     ofParameter<float> materialShininess;
+    // - world
+    ofParameter<ofVec3f> worldGravity;
     // - reset
     ofxButton reset;
     
