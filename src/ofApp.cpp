@@ -13,6 +13,8 @@ void ofApp::setup(){
     enableSmoothLighting.addListener(this, &ofApp::enableSmoothLightingChanged);
     
     // gui
+    showPanel = true;
+    showCursor = true;
     // - kinect
     panel.setup("distance in mm", "settings.xml", 0, 0);
     panel.add(kinect.minDistance);
@@ -326,7 +328,9 @@ void ofApp::draw(){
     }ofDisableDepthTest();
     
     // gui
-    panel.draw();
+    if (showPanel) {
+        panel.draw();
+    }
     
     // debug
     ofSetColor(255);
@@ -342,12 +346,16 @@ void ofApp::draw(){
     
     // - depth data
     ofVec2f debugImageSize(1920/10.0, 1080/10.0);
-    ofRect(panel.getPosition().x, panel.getHeight()+4, debugImageSize.x+2, debugImageSize.y+2);
-    texDepth.draw(panel.getPosition().x+1, panel.getHeight()+5, debugImageSize.x, debugImageSize.y);
+    if (showPanel){
+        ofRect(panel.getPosition().x, panel.getHeight()+4, debugImageSize.x+2, debugImageSize.y+2);
+        texDepth.draw(panel.getPosition().x+1, panel.getHeight()+5, debugImageSize.x, debugImageSize.y);
+    }
     
     // - RGB data
-    ofRect(panel.getPosition().x, panel.getHeight()+5+debugImageSize.y+2, debugImageSize.x+2, debugImageSize.y+2);
-    texRGB.draw(panel.getPosition().x+1, panel.getHeight()+5+debugImageSize.y+3, debugImageSize.x, debugImageSize.y);
+    if (showPanel) {
+        ofRect(panel.getPosition().x, panel.getHeight()+5+debugImageSize.y+2, debugImageSize.x+2, debugImageSize.y+2);
+        texRGB.draw(panel.getPosition().x+1, panel.getHeight()+5+debugImageSize.y+3, debugImageSize.x, debugImageSize.y);
+    }
     
     // - info
     //    ofDrawBitmapString("ofxKinectV2: Work in progress addon.\nBased on the excellent work by the OpenKinect libfreenect2 team\n\n-Only supports one Kinect v2 at a time. \n-Requires USB 3.0 port ( superspeed )\n-Requires patched libusb. If you have the libusb from ofxKinect ( v1 ) linked to your project it will prevent superspeed on Kinect V2", 10, 14);
@@ -383,6 +391,9 @@ void ofApp::keyPressed(int key){
             break;
         case 'f':
             ofToggleFullscreen();
+            break;
+        case 'h':
+            showPanel = !showPanel;
             break;
         case 'm':{
             // add model
@@ -420,7 +431,8 @@ void ofApp::mouseDragged(int x, int y, int button){
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
-    
+    showCursor ? ofHideCursor() : ofShowCursor();
+    showCursor = !showCursor;
 }
 
 //--------------------------------------------------------------

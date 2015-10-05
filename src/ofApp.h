@@ -31,6 +31,8 @@ public:
     
     // gui
     ofxPanel panel;
+    bool showPanel;
+    bool showCursor;
     ofParameter<int> step;
     ofParameter<bool> enableDrawDebug;
     ofParameter<bool> enableDrawWireFrame;
