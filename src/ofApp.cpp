@@ -105,6 +105,9 @@ void ofApp::setupWhenKinectIsReady(){
     // light
     panel.add(lightPosition.set("lightPosition", ofVec3f(w/2.0, h/2.0, kinect.minDistance/2.0), ofVec3f(0, 0, -d), ofVec3f(w, h, d)));
     // - camera
+    panel.add(cameraFov.set("cameraFov", 60, 1, 180));
+    panel.add(cameraNearDist.set("cameraNearDist", 6.65107, 0, 100));
+    panel.add(cameraFarDist.set("cameraFarDist", 6651.07, 0, d));
     panel.add(cameraPosition.set("cameraPosition", ofVec3f(w/2.0, h/2.0, 0), ofVec3f(0, 0, -d), ofVec3f(w, h, d)));
     panel.add(cameraLookAt.set("cameraLookAt", ofVec3f(w/2.0, h/2.0, kinect.minDistance), ofVec3f(0, 0, -d), ofVec3f(w, h, d)));
     // - world
@@ -245,6 +248,7 @@ void ofApp::update(){
         camera.enableMouseInput();
     }else{
         camera.disableMouseInput();
+        camera.setupPerspective(false, cameraFov, cameraNearDist, cameraFarDist, ofVec2f(0.0f, 0.0f));
         camera.setPosition(cameraPosition);
         camera.lookAt(ofVec3f(cameraLookAt), ofVec3f(0, -1, 0));
     }

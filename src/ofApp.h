@@ -44,6 +44,9 @@ public:
     // - camera
     ofParameter<ofVec3f> cameraPosition;
     ofParameter<ofVec3f> cameraLookAt;
+    ofParameter<float> cameraFov;
+    ofParameter<float> cameraNearDist;
+    ofParameter<float> cameraFarDist;
     // - light
     ofParameter<ofFloatColor> lightSpecularColor;
     ofParameter<ofFloatColor> lightDissuseColor;
