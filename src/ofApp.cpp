@@ -20,6 +20,7 @@ void ofApp::setup(){
     panel.add(kinect.minDistance);
     panel.add(kinect.maxDistance);
     panel.add(step.set("step", 5, 3, 30));
+    panel.add(stopUpdatingKinectBullet.set("stopUpdatingKinectBullet", false));
     // - debug
     panel.add(enableDrawDebug.set("enableDrawDebug", true));
     panel.add(enableDrawWireFrame.set("enableDrawWireFrame", true));
@@ -197,12 +198,14 @@ void ofApp::update(){
     }
     
     // kinect
-    if (h != 0 && kinectBulletShape != NULL) {
-        kinectBulletShape->remove();
-        kinectBulletShape->create( world.world, kinectMesh, ofVec3f(0,0,0), 0.f, ofVec3f(0, 0, 0), ofVec3f(w, h, kinect.maxDistance.getMax()) );
-        kinectBulletShape->add();
-        kinectBulletShape->enableKinematic();
-        kinectBulletShape->setActivationState( DISABLE_DEACTIVATION );
+    if (!stopUpdatingKinectBullet) {
+        if (h != 0 && kinectBulletShape != NULL) {
+            kinectBulletShape->remove();
+            kinectBulletShape->create( world.world, kinectMesh, ofVec3f(0,0,0), 0.f, ofVec3f(0, 0, 0), ofVec3f(w, h, kinect.maxDistance.getMax()) );
+            kinectBulletShape->add();
+            kinectBulletShape->enableKinematic();
+            kinectBulletShape->setActivationState( DISABLE_DEACTIVATION );
+        }
     }
     
     // model

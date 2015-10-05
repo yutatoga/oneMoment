@@ -34,6 +34,7 @@ public:
     bool showPanel;
     bool showCursor;
     ofParameter<int> step;
+    ofParameter<bool> stopUpdatingKinectBullet;
     ofParameter<bool> enableDrawDebug;
     ofParameter<bool> enableDrawWireFrame;
     ofParameter<bool> enableDrawGuideLine;
