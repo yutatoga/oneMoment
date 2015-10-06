@@ -62,6 +62,7 @@ public:
     ofParameter<ofFloatColor> materialEmissiveColor;
     ofParameter<float> materialShininess;
     ofParameter<bool> enableAddModel;
+    ofParameter<bool> enableAddModelRandom;
     // - world
     ofParameter<ofVec3f> worldGravity;
     ofParameter<ofVec3f> modelStartPosition;

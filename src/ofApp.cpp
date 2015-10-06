@@ -33,6 +33,7 @@ void ofApp::setup(){
     panel.add(worldGravity.set("worldGravity", ofVec3f(0, 0, 15.0), ofVec3f(-30, -30, -30), ofVec3f(30, 30, 30)));
     panel.add(modelMass.set("modelMass", 0.000005, 0.000005, 1)); // 1 is 1 kg
     panel.add(enableAddModel.set("enableAddModel", false));
+    panel.add(enableAddModelRandom.set("enableAddModelRandom", false));
     // - light
     panel.add(lightSpecularColor.set("lightSpecularColor", ofFloatColor::red, ofFloatColor::black, ofFloatColor::white));
     panel.add(lightDissuseColor.set("lightDiffuseColor", ofFloatColor::green, ofFloatColor::black, ofFloatColor::white));
@@ -214,7 +215,7 @@ void ofApp::update(){
     
     // model
     if (enableAddModel) {
-        // add model
+        // add model in modelStartPosition
         ofxBulletCustomShape *bulletCustomShape;
         bulletCustomShape = new ofxBulletCustomShape;
         ofQuaternion startRot = ofQuaternion(1., 0., 0., PI);
@@ -224,6 +225,22 @@ void ofApp::update(){
         ofVec3f frc(camera.getLookAtDir());
         frc.normalize();
         bulletCustomShape->applyCentralForce(frc*0.005);
+        assimpModelBulletShapes.push_back(bulletCustomShape);
+    }
+    if (enableAddModelRandom) {
+        // add model in random x, random y and modelStartPosition.z
+        ofxBulletCustomShape *bulletCustomShape;
+        bulletCustomShape = new ofxBulletCustomShape;
+        ofQuaternion startRot = ofQuaternion(ofRandom(0, 1), ofRandom(0, 1), ofRandom(0, 1), ofRandom(-1*PI, PI));
+        bulletCustomShape->init((btCompoundShape*)assimpModelBulletShapes[0]->getCollisionShape(), assimpModelBulletShapes[0]->getCentroid());
+        ofVec3f instantModelStartPosition(ofRandom(0, w), ofRandom(0, h), modelStartPosition->z);
+        bulletCustomShape->create(world.world, instantModelStartPosition, startRot, modelMass);
+        bulletCustomShape->add();
+        ofVec3f frc(camera.getLookAtDir());
+        frc.normalize();
+        bulletCustomShape->applyCentralForce(frc*ofRandom(-0.01, 0.01));
+        ofVec3f instantTorque(ofRandom(-0.005, 0.005), ofRandom(-0.005, 0.005), ofRandom(-0.005, 0.005));
+        bulletCustomShape->applyTorque(instantTorque);
         assimpModelBulletShapes.push_back(bulletCustomShape);
     }
     
