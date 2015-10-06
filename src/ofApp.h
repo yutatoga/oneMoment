@@ -6,6 +6,7 @@
 #include "ofxXmlSettings.h"
 #include "ofxBullet.h"
 #include "ofxAssimpModelLoader.h"
+#include "ofxDmx.h"
 
 class ofApp : public ofBaseApp{
     
@@ -67,6 +68,8 @@ public:
     ofParameter<ofVec3f> worldGravity;
     ofParameter<ofVec3f> modelStartPosition;
     ofParameter<float> modelMass;
+    // - dmx
+    ofParameter<int> dmxChannel1;
     // - reset
     ofxButton reset;
     
@@ -94,6 +97,9 @@ public:
     
     // material
     ofMaterial material;
+    
+    // dmx
+    ofxDmx dmx;
     
     // debug
     // - debug spheres

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B29B12921BC41AB900C01E2F /* ofxDmx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B29B12901BC41AB900C01E2F /* ofxDmx.cpp */; };
 		B2E632DB1BC28C3B0031BEBD /* ofxAssimpAnimation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B2E632A71BC28C3B0031BEBD /* ofxAssimpAnimation.cpp */; };
 		B2E632DC1BC28C3B0031BEBD /* ofxAssimpMeshHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B2E632A91BC28C3B0031BEBD /* ofxAssimpMeshHelper.cpp */; };
 		B2E632DD1BC28C3B0031BEBD /* ofxAssimpModelLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B2E632AB1BC28C3B0031BEBD /* ofxAssimpModelLoader.cpp */; };
@@ -271,6 +272,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		B29B12901BC41AB900C01E2F /* ofxDmx.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ofxDmx.cpp; sourceTree = "<group>"; };
+		B29B12911BC41AB900C01E2F /* ofxDmx.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ofxDmx.h; sourceTree = "<group>"; };
 		B2E632A71BC28C3B0031BEBD /* ofxAssimpAnimation.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ofxAssimpAnimation.cpp; sourceTree = "<group>"; };
 		B2E632A81BC28C3B0031BEBD /* ofxAssimpAnimation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ofxAssimpAnimation.h; sourceTree = "<group>"; };
 		B2E632A91BC28C3B0031BEBD /* ofxAssimpMeshHelper.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ofxAssimpMeshHelper.cpp; sourceTree = "<group>"; };
@@ -1002,6 +1005,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		B29B128E1BC41AB900C01E2F /* ofxDmx */ = {
+			isa = PBXGroup;
+			children = (
+				B29B128F1BC41AB900C01E2F /* src */,
+			);
+			name = ofxDmx;
+			sourceTree = "<group>";
+		};
+		B29B128F1BC41AB900C01E2F /* src */ = {
+			isa = PBXGroup;
+			children = (
+				B29B12901BC41AB900C01E2F /* ofxDmx.cpp */,
+				B29B12911BC41AB900C01E2F /* ofxDmx.h */,
+			);
+			name = src;
+			path = ../../../addons/ofxDmx/src;
+			sourceTree = "<group>";
+		};
 		B2E632A51BC28C3B0031BEBD /* ofxAssimpModelLoader */ = {
 			isa = PBXGroup;
 			children = (
@@ -2368,6 +2389,7 @@
 				B2E635A91BC28C550031BEBD /* ofxKinectV2_aware */,
 				B2E635FE1BC28C5A0031BEBD /* ofxOpenCv */,
 				B2E636801BC28C750031BEBD /* ofxXmlSettings */,
+				B29B128E1BC41AB900C01E2F /* ofxDmx */,
 			);
 			name = addons;
 			sourceTree = "<group>";
@@ -2690,6 +2712,7 @@
 				B2E6357F1BC28C400031BEBD /* btQuickprof.cpp in Sources */,
 				B2E634EA1BC28C400031BEBD /* ofxBulletConvexShape.cpp in Sources */,
 				B2E634F51BC28C400031BEBD /* ofxBulletTriMeshShape.cpp in Sources */,
+				B29B12921BC41AB900C01E2F /* ofxDmx.cpp in Sources */,
 				B2E635A41BC28C440031BEBD /* ofxLabel.cpp in Sources */,
 				B2E635F21BC28C550031BEBD /* ofRGBPacketProcessor.cpp in Sources */,
 				B2E6367D1BC28C5A0031BEBD /* ofxCvImage.cpp in Sources */,

@@ -34,6 +34,8 @@ void ofApp::setup(){
     panel.add(modelMass.set("modelMass", 0.000005, 0.000005, 1)); // 1 is 1 kg
     panel.add(enableAddModel.set("enableAddModel", false));
     panel.add(enableAddModelRandom.set("enableAddModelRandom", false));
+    // - dmx
+    panel.add(dmxChannel1.set("DMX Channel 1", 127, 0, 255));
     // - light
     panel.add(lightSpecularColor.set("lightSpecularColor", ofFloatColor::red, ofFloatColor::black, ofFloatColor::white));
     panel.add(lightDissuseColor.set("lightDiffuseColor", ofFloatColor::green, ofFloatColor::black, ofFloatColor::white));
@@ -52,6 +54,10 @@ void ofApp::setup(){
     
     // kinect
     kinect.open();
+    
+    // dmx
+    dmx.connect("tty.usbserial-ENY46L4I"); // use the name
+    //dmx.connect(0); // or use a number
     
     // caemera
     camera.setAutoDistance(false);
@@ -153,6 +159,10 @@ void ofApp::setupWhenKinectIsReady(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
+    // dmx
+    dmx.setLevel(1, dmxChannel1);
+    
+    // kinect
     kinect.update();
     if( kinect.isFrameNew() ){
         texDepth.loadData(kinect.getDepthPixels());
