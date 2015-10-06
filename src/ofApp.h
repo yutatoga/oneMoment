@@ -7,6 +7,7 @@
 #include "ofxBullet.h"
 #include "ofxAssimpModelLoader.h"
 #include "ofxDmx.h"
+#include "ofxTween.h"
 
 class ofApp : public ofBaseApp{
     
@@ -29,6 +30,7 @@ public:
     bool valueIsInKinectRange(float value);
     void resetPressed();
     void enableSmoothLightingChanged(bool &enableSmoothLightingStatus);
+    void doEase(unsigned duration, unsigned delay);
     
     // gui
     ofxPanel panel;
@@ -100,6 +102,10 @@ public:
     
     // dmx
     ofxDmx dmx;
+    
+    // tween
+    ofxTween tween;
+    ofxEasingSine easingSine;
     
     // debug
     // - debug spheres

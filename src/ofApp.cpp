@@ -160,7 +160,13 @@ void ofApp::setupWhenKinectIsReady(){
 //--------------------------------------------------------------
 void ofApp::update(){
     // dmx
+    dmxChannel1.set(tween.update());
     dmx.setLevel(1, dmxChannel1);
+    dmx.update();
+    // FIXME: hard code
+    if (ofGetFrameNum() % 600 == 0){
+        doEase(3000, 0);
+    }
     
     // kinect
     kinect.update();
@@ -431,6 +437,16 @@ void ofApp::resetPressed(){
 
 void ofApp::enableSmoothLightingChanged(bool &enableSmoothLightingStatus){
     ofSetSmoothLighting(enableSmoothLighting);
+}
+
+void ofApp::doEase(unsigned duration, unsigned delay){
+    if (dmxChannel1 == 0) {
+        // ease in
+        tween.setParameters(1, easingSine, ofxTween::easeIn, 0, 255, duration, delay);
+    }
+    if (dmxChannel1 == 255) {
+        tween.setParameters(1, easingSine, ofxTween::easeIn, 255, 0, duration, delay);
+    }
 }
 
 //--------------------------------------------------------------
