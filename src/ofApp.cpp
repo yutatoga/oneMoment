@@ -411,14 +411,24 @@ void ofApp::draw(){
     // - depth data
     ofVec2f debugImageSize(1920/10.0, 1080/10.0);
     if (showPanel){
-        ofRect(panel.getPosition().x, panel.getHeight()+4, debugImageSize.x+2, debugImageSize.y+2);
-        texDepth.draw(panel.getPosition().x+1, panel.getHeight()+5, debugImageSize.x, debugImageSize.y);
+        // draw below the gui panel
+        // ofRect(panel.getPosition().x, panel.getHeight()+4, debugImageSize.x+2, debugImageSize.y+2);
+        // texDepth.draw(panel.getPosition().x+1, panel.getHeight()+5, debugImageSize.x, debugImageSize.y);
+        
+        // draw upper right corner
+        ofRect(ofGetWidth()-debugImageSize.x-3, 1, debugImageSize.x+2, debugImageSize.y+2);
+        texDepth.draw(ofGetWidth()-debugImageSize.x-2, 2, debugImageSize.x, debugImageSize.y);
     }
     
     // - RGB data
     if (showPanel) {
-        ofRect(panel.getPosition().x, panel.getHeight()+5+debugImageSize.y+2, debugImageSize.x+2, debugImageSize.y+2);
-        texRGB.draw(panel.getPosition().x+1, panel.getHeight()+5+debugImageSize.y+3, debugImageSize.x, debugImageSize.y);
+        // draw below the gui panel
+        // ofRect(panel.getPosition().x, panel.getHeight()+5+debugImageSize.y+2, debugImageSize.x+2, debugImageSize.y+2);
+        //texRGB.draw(panel.getPosition().x+1, panel.getHeight()+5+debugImageSize.y+3, debugImageSize.x, debugImageSize.y);
+        
+        // draw upper right corner
+        ofRect(ofGetWidth()-debugImageSize.x-3, debugImageSize.y+4, debugImageSize.x+2, debugImageSize.y+2);
+        texRGB.draw(ofGetWidth()-debugImageSize.x-2, debugImageSize.y+5, debugImageSize.x, debugImageSize.y);
     }
     
     // - info
