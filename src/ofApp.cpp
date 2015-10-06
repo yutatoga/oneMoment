@@ -265,6 +265,18 @@ void ofApp::update(){
                 assimpModelBulletShapes[i]->remove();
                 assimpModelBulletShapes.erase(assimpModelBulletShapes.begin() + i);
                 break;
+            }else{
+                ofRectangle rect(0, 0, w, h);
+                if (rect.inside(assimpModelBulletShapes[i]->getPosition().x, assimpModelBulletShapes[i]->getPosition().y)) {
+                    float kinectDepth = rawDepthPixels[(int)assimpModelBulletShapes[i]->getPosition().x + (int)assimpModelBulletShapes[i]->getPosition().y*w];
+                    if (kinectDepth > kinect.minDistance && kinectDepth < kinect.maxDistance && assimpModelBulletShapes[i]->getPosition().z > kinectDepth) {
+                        // add force to the model which is above the kinect mesh
+                        if (ofGetMousePressed()) {
+                            ofVec3f wind(0, 0, 0.001); // FIXME: hard code
+                            assimpModelBulletShapes[i]->applyCentralForce(wind);
+                        }
+                    }
+                }
             }
         }
     }
@@ -443,6 +455,13 @@ void ofApp::keyPressed(int key){
             frc.normalize();
             bulletCustomShape->applyCentralForce(frc*0.005);
             assimpModelBulletShapes.push_back(bulletCustomShape);
+        }
+            break;
+        case 'w':{
+            ofVec3f wind(0.01, 0, 0);
+            for (int i = 0; i < assimpModelBulletShapes.size(); i++) {
+                assimpModelBulletShapes[i]->applyCentralForce(wind);
+            }
         }
             break;
         default:
