@@ -165,7 +165,7 @@ void ofApp::update(){
     dmx.update();
     // FIXME: hard code
     if (ofGetFrameNum() % 600 == 0){
-        doEase(3000, 0);
+        doEase(10000, 0);
     }
     
     // kinect
@@ -484,7 +484,7 @@ void ofApp::keyPressed(int key){
         }
             break;
         case 'w':{
-            ofVec3f wind(0.01, 0, 0);
+            ofVec3f wind(0, 0, 0.01);
             for (int i = 0; i < assimpModelBulletShapes.size(); i++) {
                 assimpModelBulletShapes[i]->applyCentralForce(wind);
             }
