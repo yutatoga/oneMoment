@@ -24,4 +24,12 @@
 	<materialShininess>64</materialShininess>
 	<lightPosition>256, 212, 12000</lightPosition>
 	<modelStartPosition>256, 212, 1102.04</modelStartPosition>
+<stopUpdatingKinectBullet>0</stopUpdatingKinectBullet>
+	<hideKinectMesh>0</hideKinectMesh>
+	<modelMass>5e-06</modelMass>
+	<enableAddModel>0</enableAddModel>
+	<enableAddModelRandom>1</enableAddModelRandom>
+	<cameraFov>60</cameraFov>
+	<cameraNearDist>60</cameraNearDist>
+	<cameraFarDist>6651.07</cameraFarDist>
 </distance_in_mm>

@@ -233,7 +233,16 @@ void ofApp::update(){
         bulletCustomShape = new ofxBulletCustomShape;
         ofQuaternion startRot = ofQuaternion(ofRandom(0, 1), ofRandom(0, 1), ofRandom(0, 1), ofRandom(-1*PI, PI));
         bulletCustomShape->init((btCompoundShape*)assimpModelBulletShapes[0]->getCollisionShape(), assimpModelBulletShapes[0]->getCentroid());
-        ofVec3f instantModelStartPosition(ofRandom(0, w), ofRandom(0, h), modelStartPosition->z);
+        // random square
+//        ofVec3f instantModelStartPosition(ofRandom(0, w), ofRandom(0, h), modelStartPosition->z);
+        
+        // random circle
+        float instantRadius = ofRandom(0, 500);
+//        float instantRadius = (ofRandom(-500, 500)+ofRandom(-500, 500)+ofRandom(-500, 500)+ofRandom(-500, 500)+ofRandom(-500, 500))/5.0;
+        float instantTheta = ofRandom(-PI, PI);
+        ofVec3f instantModelStartPosition(w/2.0+instantRadius*cos(instantTheta), h/2.0+instantRadius*sin(instantTheta), modelStartPosition->z);
+
+
         bulletCustomShape->create(world.world, instantModelStartPosition, startRot, modelMass);
         bulletCustomShape->add();
         ofVec3f frc(camera.getLookAtDir());
