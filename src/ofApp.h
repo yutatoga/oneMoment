@@ -29,6 +29,7 @@ public:
     void setupWhenKinectIsReady();
     bool valueIsInKinectRange(float value);
     void doEase(unsigned duration, unsigned delay);
+    void changeAssimpModel(int modelId);
     // listener
     void resetPressed();
     void enableSmoothLightingChanged(bool &enableSmoothLightingStatus);

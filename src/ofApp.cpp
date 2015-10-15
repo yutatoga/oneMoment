@@ -156,6 +156,8 @@ void ofApp::setupWhenKinectIsReady(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
+    
+    
     // dmx
     dmxChannel1.set(tween.update());
     dmx.setLevel(1, dmxChannel1);
@@ -453,6 +455,49 @@ void ofApp::doEase(unsigned duration, unsigned delay){
     }
 }
 
+void ofApp::changeAssimpModel(int modelId){
+    ofLogNotice("reload assimp model: current model ID = "+ofToString(modelId));
+    
+    // remove and clear all bullet shapees
+    for (int i = 0; i < (int)assimpModelBulletShapes.size(); i++) {
+        assimpModelBulletShapes[i]->remove();
+    }
+    assimpModelBulletShapes.clear();
+    // clear assimp model
+    ofVec3f scale(1.0, 1.0, 1.0);
+    assimpModelLoader.clear();
+    // select model by modelId
+    switch (modelId) {
+        case 1:
+            assimpModelLoader.loadModel("sakura2/sakura2.3ds", true);
+            break;
+        case 2:
+            assimpModelLoader.loadModel("dna/DNA_06.obj", true);
+            break;
+        default:
+            break;
+    }
+    // set up new model and bullet
+    assimpModelLoader.setPosition(ofGetWidth()/2, ofGetHeight()/2, 0);
+    assimpModelLoader.setScale(scale.x, scale.y, scale.z);
+    assimpModelLoader.update();
+    ofQuaternion startRot = ofQuaternion(1., 0., 0., PI);
+    assimpModelBulletShapes.resize(3);
+    for (int i = 0; i < assimpModelBulletShapes.size(); i++) {
+        assimpModelBulletShapes[i] = new ofxBulletCustomShape;
+        if (i == 0) {
+            for (int i = 0; i < assimpModelLoader.getNumMeshes(); i++) {
+                assimpModelBulletShapes[i]->addMesh(assimpModelLoader.getMesh(i), scale, true);
+            }
+        } else {
+            assimpModelBulletShapes[i]->init((btCompoundShape*)assimpModelBulletShapes[0]->getCollisionShape(), assimpModelBulletShapes[0]->getCentroid());
+        }
+        ofVec3f startLoc = ofVec3f( ofRandom(-5, 5), ofRandom(0, -10), ofRandom(-5, 5) );
+        assimpModelBulletShapes[i]->create(world.world, startLoc, startRot, 3.);
+        assimpModelBulletShapes[i]->add();
+    }
+}
+
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
     switch (key) {
@@ -466,6 +511,12 @@ void ofApp::keyPressed(int key){
             // ss->applyCentralForce(frc*0.01);
             spheres.push_back( ss );
         }
+            break;
+        case '1':
+            reloadAssimpModel(1);
+            break;
+        case '2':
+            reloadAssimpModel(2);
             break;
         case 'f':
             ofToggleFullscreen();
