@@ -7,7 +7,7 @@
 	<enableDrawGuideLine>0</enableDrawGuideLine>
 	<enableMouseInput>0</enableMouseInput>
 	<enableDrawDebugSpheres>0</enableDrawDebugSpheres>
-	<cameraPosition>256, 212, 1346.94</cameraPosition>
+	<cameraPosition>256, 212, 0</cameraPosition>
 	<cameraLookAt>256, 212, 12000</cameraLookAt>
 <distance_in_mm/>
 <lightSpecularColor>0, 0, 0, 1</lightSpecularColor>
@@ -32,5 +32,6 @@
 	<cameraFov>60</cameraFov>
 	<cameraNearDist>60</cameraNearDist>
 	<cameraFarDist>6651.07</cameraFarDist>
-<DMX_Channel_1>61</DMX_Channel_1>
+<DMX_Channel_1>255</DMX_Channel_1>
+<disableKinect>0</disableKinect>
 </distance_in_mm>

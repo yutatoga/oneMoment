@@ -28,14 +28,16 @@ public:
     
     void setupWhenKinectIsReady();
     bool valueIsInKinectRange(float value);
+    void doEase(unsigned duration, unsigned delay);
+    // listener
     void resetPressed();
     void enableSmoothLightingChanged(bool &enableSmoothLightingStatus);
-    void doEase(unsigned duration, unsigned delay);
-    
+
     // gui
     ofxPanel panel;
     bool showPanel;
-    bool showCursor;
+
+    //- kinect
     ofParameter<int> step;
     ofParameter<bool> stopUpdatingKinectBullet;
     ofParameter<bool> enableDrawDebug;
@@ -81,7 +83,10 @@ public:
     ofTexture texRGB;
     ofFloatPixels rawDepthPixels;
     ofMesh kinectMesh;
-    
+    int kinectWidth;
+    int kinectHeight;
+    int kinectDepth;
+    bool kinectIsReady;
     // camera
     ofEasyCam camera;
     

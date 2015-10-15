@@ -8,15 +8,21 @@ void ofApp::setup(){
     }
     ofBackground(0, 0, 0);
     
+    // kinect
+    kinectIsReady = false;
+    kinect.open();
+    kinectWidth = 512;
+    kinectHeight = 424;
+    kinectDepth = (int)kinect.maxDistance.getMax();
+    
     // listener
     reset.addListener(this, &ofApp::resetPressed);
     enableSmoothLighting.addListener(this, &ofApp::enableSmoothLightingChanged);
     
     // gui
     showPanel = true;
-    showCursor = true;
-    // - kinect
     panel.setup("distance in mm", "settings.xml", 0, 0);
+    // - kinect
     panel.add(kinect.minDistance);
     panel.add(kinect.maxDistance);
     panel.add(step.set("step", 5, 3, 30));
@@ -29,11 +35,6 @@ void ofApp::setup(){
     panel.add(enableMouseInput.set("enableMouseInput", true));
     panel.add(enableDrawDebugSpheres.set("enableDrawDebugSpheres", false));
     panel.add(reset.setup("reset"));
-    // - world
-    panel.add(worldGravity.set("worldGravity", ofVec3f(0, 0, 15.0), ofVec3f(-30, -30, -30), ofVec3f(30, 30, 30)));
-    panel.add(modelMass.set("modelMass", 0.000005, 0.000005, 1)); // 1 is 1 kg
-    panel.add(enableAddModel.set("enableAddModel", false));
-    panel.add(enableAddModelRandom.set("enableAddModelRandom", false));
     // - dmx
     panel.add(dmxChannel1.set("DMX Channel 1", 127, 0, 255));
     // - light
@@ -43,17 +44,29 @@ void ofApp::setup(){
     panel.add(lightAttenuation.set("lightAttenuation", ofVec3f(1.0, 0.0, 0.0), ofVec3f(0.0, 0.0, 0.0), ofVec3f(5.0, 0.01, 0.0001)));
     panel.add(enableSmoothLighting.set("enableSmoothLighting", true));
     panel.add(enableSeparateSpecularLight.set("enableSeparateSpecularLight", false));
+    panel.add(lightPosition.set("lightPosition", ofVec3f(kinectWidth/2.0, kinectHeight/2.0, kinect.minDistance/2.0), ofVec3f(0, 0, -kinectDepth), ofVec3f(kinectWidth, kinectHeight, kinectDepth)));
     // - material
     panel.add(materialSpecularColor.set("materialSpecularColor", ofFloatColor::red, ofFloatColor::black, ofFloatColor::white));
     panel.add(materialDiffuseColor.set("materialDiffuseColor", ofFloatColor::green, ofFloatColor::black, ofFloatColor::white));
     panel.add(materialAmbientColor.set("materialAmbientColor", ofFloatColor::blue, ofFloatColor::black, ofFloatColor::white));
     panel.add(materialEmissiveColor.set("materialEmissiveColor", ofFloatColor::black, ofFloatColor::black, ofFloatColor::white));
     panel.add(materialShininess.set("materialShininess", 64, 0, 128));
+    // camera
+    panel.add(cameraFov.set("cameraFov", 60, 1, 180));
+    panel.add(cameraNearDist.set("cameraNearDist", 6.65107, 0, 100));
+    panel.add(cameraFarDist.set("cameraFarDist", 6651.07, 0, kinectDepth));
+    panel.add(cameraPosition.set("cameraPosition", ofVec3f(kinectWidth/2.0, kinectHeight/2.0, 0), ofVec3f(0, 0, -kinectDepth), ofVec3f(kinectWidth, kinectHeight, kinectDepth)));
+    panel.add(cameraLookAt.set("cameraLookAt", ofVec3f(kinectWidth/2.0, kinectHeight/2.0, kinect.minDistance), ofVec3f(0, 0, -kinectDepth), ofVec3f(kinectWidth, kinectHeight, kinectDepth)));
+    // world
+    panel.add(modelStartPosition.set("modelStartPosition", ofVec3f(cameraPosition), cameraPosition.getMin(), cameraPosition.getMax()));
+    panel.add(worldGravity.set("worldGravity", ofVec3f(0, 0, 15.0), ofVec3f(-30, -30, -30), ofVec3f(30, 30, 30)));
+    panel.add(modelMass.set("modelMass", 0.000005, 0.000005, 1)); // 1 is 1 kg
+    panel.add(enableAddModel.set("enableAddModel", false));
+    panel.add(enableAddModelRandom.set("enableAddModelRandom", false));
+    // load saved settings data
     panel.loadFromFile("settings.xml");
-    // >> to be continued in setupWhenKinectIsReady
-    
-    // kinect
-    kinect.open();
+    // minimize all guis
+    panel.minimizeAll();
     
     // dmx
     dmx.connect("tty.usbserial-ENY46L4I"); // use the name
@@ -62,6 +75,9 @@ void ofApp::setup(){
     // caemera
     camera.setAutoDistance(false);
     if (!enableMouseInput) camera.disableMouseInput();
+    camera.setPosition(cameraPosition);
+    ofVec3f upVector(0, -1, 0);
+    camera.lookAt(ofVec3f(cameraLookAt), upVector);
     
     // bullet
     world.setup();
@@ -96,48 +112,20 @@ void ofApp::setup(){
     light.setAmbientColor(lightAmbientColor);
     light.setAttenuation(lightAttenuation->x, lightAttenuation->y, lightAttenuation->z);
     ofSetSmoothLighting(enableSmoothLighting);
+    light.setPosition(lightPosition);
+    light.setPointLight();
     
     // debug
     ofSetVerticalSync(false);
     ofSetFrameRate(0);
     // - camera target
     debugSphereCameraTarget.set(10, 3);
-}
-
-void ofApp::setupWhenKinectIsReady(){
-    int w = rawDepthPixels.getWidth();
-    int h = rawDepthPixels.getHeight();
-    int d = (int)kinect.maxDistance.getMax();
-    // gui
-    // light
-    panel.add(lightPosition.set("lightPosition", ofVec3f(w/2.0, h/2.0, kinect.minDistance/2.0), ofVec3f(0, 0, -d), ofVec3f(w, h, d)));
-    // - camera
-    panel.add(cameraFov.set("cameraFov", 60, 1, 180));
-    panel.add(cameraNearDist.set("cameraNearDist", 6.65107, 0, 100));
-    panel.add(cameraFarDist.set("cameraFarDist", 6651.07, 0, d));
-    panel.add(cameraPosition.set("cameraPosition", ofVec3f(w/2.0, h/2.0, 0), ofVec3f(0, 0, -d), ofVec3f(w, h, d)));
-    panel.add(cameraLookAt.set("cameraLookAt", ofVec3f(w/2.0, h/2.0, kinect.minDistance), ofVec3f(0, 0, -d), ofVec3f(w, h, d)));
-    // - world
-    panel.add(modelStartPosition.set("modelStartPosition", ofVec3f(cameraPosition), cameraPosition.getMin(), cameraPosition.getMax()));
-    // - gui
-    panel.loadFromFile("settings.xml");
-    panel.minimizeAll();
-    
-    // light
-    light.setPosition(lightPosition);
-    light.setPointLight();
-    
-    // camera
-    camera.setPosition(cameraPosition);
-    ofVec3f upVector(0, -1, 0);
-    camera.lookAt(ofVec3f(cameraLookAt), upVector);
-    
-    // debug spheres
+    // - debug spheres
     float debugSphereRadius = 5;
     int debugSphereResolution = 3;
     float samplingNumber = 100;
-    ofVec3f debugSphereNumber(w/samplingNumber, h/samplingNumber, d/samplingNumber);
-    ofVec3f gapBetweenSpheres(w/debugSphereNumber.x, h/debugSphereNumber.y, d/debugSphereNumber.z);
+    ofVec3f debugSphereNumber(kinectWidth/samplingNumber, kinectHeight/samplingNumber, kinectDepth/samplingNumber);
+    ofVec3f gapBetweenSpheres(kinectWidth/debugSphereNumber.x, kinectHeight/debugSphereNumber.y, kinectDepth/debugSphereNumber.z);
     for (int x = 0; x < debugSphereNumber.x; x++) {
         for (int y = 0; y < debugSphereNumber.y; y++) {
             for (int z = 0; z < debugSphereNumber.z; z++) {
@@ -148,13 +136,22 @@ void ofApp::setupWhenKinectIsReady(){
             }
         }
     }
-    
-    // - init kinectBulletShape
+}
+
+void ofApp::setupWhenKinectIsReady(){
+    kinectWidth = rawDepthPixels.getWidth();
+    kinectHeight = rawDepthPixels.getHeight();
+    kinectDepth = (int)kinect.maxDistance.getMax();
+
+    // init kinectBulletShape
     kinectBulletShape = shared_ptr< ofxBulletTriMeshShape >( new ofxBulletTriMeshShape() );
-    kinectBulletShape->create( world.world, kinectMesh, ofVec3f(0,0,0), 0.f, ofVec3f(0, 0, 0), ofVec3f(w, h, kinect.maxDistance.getMax()) );
+    kinectBulletShape->create( world.world, kinectMesh, ofVec3f(0,0,0), 0.f, ofVec3f(0, 0, 0), ofVec3f(kinectWidth, kinectHeight, kinect.maxDistance.getMax()) );
     kinectBulletShape->add();
     kinectBulletShape->enableKinematic();
     kinectBulletShape->setActivationState( DISABLE_DEACTIVATION );
+    
+    kinectIsReady = true;
+    ofLogNotice("Kinect is ready!");
 }
 
 //--------------------------------------------------------------
@@ -174,55 +171,52 @@ void ofApp::update(){
         texDepth.loadData(kinect.getDepthPixels());
         texRGB.loadData(kinect.getRgbPixels());
         rawDepthPixels = kinect.getRawDepthPixels();
-    }
-    
-    // mesh
-    kinectMesh.clear();
-    int w = rawDepthPixels.getWidth();
-    int h = rawDepthPixels.getHeight();
-    float depth;
-    
-    // add vertex to mesh and save indexes
-    vector< vector<int> > indexes;
-    int id = 0;
-    for (int y = 0; y < h; y += step) {
-        vector<int> tempVector;
-        for (int x = 0; x < w; x += step) {
-            float distance = rawDepthPixels[x+y*w];
-            kinectMesh.addVertex(ofVec3f(x, y, distance));
-            if (distance > kinect.minDistance && distance < kinect.maxDistance) {
-                tempVector.push_back(id);
-            }else{
-                tempVector.push_back(-1); // set -1 for out of range
+        
+        // mesh
+        kinectMesh.clear();
+        
+        // add vertex to mesh and save indexes
+        vector< vector<int> > indexes;
+        int id = 0;
+        for (int y = 0; y < kinectHeight; y += step) {
+            vector<int> tempVector;
+            for (int x = 0; x < kinectWidth; x += step) {
+                float distance = rawDepthPixels[x+y*kinectWidth];
+                kinectMesh.addVertex(ofVec3f(x, y, distance));
+                if (distance > kinect.minDistance && distance < kinect.maxDistance) {
+                    tempVector.push_back(id);
+                }else{
+                    tempVector.push_back(-1); // set -1 for out of range
+                }
+                id++;
             }
-            id++;
+            indexes.push_back(tempVector);
         }
-        indexes.push_back(tempVector);
-    }
-    
-    // set triangle
-    for (int y = 0; y < h-step; y += step) {
-        for (int x = 0; x < w-step; x += step) {
-            if (indexes[y/step][x/step] != -1 &&
-                indexes[y/step][x/step+1] !=  -1 &&
-                indexes[y/step+1][x/step+1] != -1 &&
-                indexes[y/step+1][x/step] != -1) {
-                kinectMesh.addTriangle(indexes[y/step][x/step], indexes[y/step][x/step+1], indexes[y/step+1][x/step+1]);
-                kinectMesh.addTriangle(indexes[y/step][x/step], indexes[y/step+1][x/step+1], indexes[y/step+1][x/step]);
+        
+        // set triangle
+        for (int y = 0; y < kinectHeight-step; y += step) {
+            for (int x = 0; x < kinectWidth-step; x += step) {
+                if (indexes[y/step][x/step] != -1 &&
+                    indexes[y/step][x/step+1] !=  -1 &&
+                    indexes[y/step+1][x/step+1] != -1 &&
+                    indexes[y/step+1][x/step] != -1) {
+                    kinectMesh.addTriangle(indexes[y/step][x/step], indexes[y/step][x/step+1], indexes[y/step+1][x/step+1]);
+                    kinectMesh.addTriangle(indexes[y/step][x/step], indexes[y/step+1][x/step+1], indexes[y/step+1][x/step]);
+                }
             }
+        }
+        
+        // bullet
+        if (kinectBulletShape == NULL ) {
+            setupWhenKinectIsReady();
         }
     }
     
     // bullet
-    if (h != 0 && kinectBulletShape == NULL ) {
-        setupWhenKinectIsReady();
-    }
-    
-    // kinect
     if (!stopUpdatingKinectBullet) {
-        if (h != 0 && kinectBulletShape != NULL) {
+        if (kinectHeight != 0 && kinectBulletShape != NULL) {
             kinectBulletShape->remove();
-            kinectBulletShape->create( world.world, kinectMesh, ofVec3f(0,0,0), 0.f, ofVec3f(0, 0, 0), ofVec3f(w, h, kinect.maxDistance.getMax()) );
+            kinectBulletShape->create( world.world, kinectMesh, ofVec3f(0,0,0), 0.f, ofVec3f(0, 0, 0), ofVec3f(kinectWidth, kinectHeight, kinect.maxDistance.getMax()) );
             kinectBulletShape->add();
             kinectBulletShape->enableKinematic();
             kinectBulletShape->setActivationState( DISABLE_DEACTIVATION );
@@ -256,7 +250,7 @@ void ofApp::update(){
         float instantRadius = ofRandom(0, 500);
 //        float instantRadius = (ofRandom(-500, 500)+ofRandom(-500, 500)+ofRandom(-500, 500)+ofRandom(-500, 500)+ofRandom(-500, 500))/5.0;
         float instantTheta = ofRandom(-PI, PI);
-        ofVec3f instantModelStartPosition(w/2.0+instantRadius*cos(instantTheta), h/2.0+instantRadius*sin(instantTheta), modelStartPosition->z);
+        ofVec3f instantModelStartPosition(kinectWidth/2.0+instantRadius*cos(instantTheta), kinectHeight/2.0+instantRadius*sin(instantTheta), modelStartPosition->z);
 
 
         bulletCustomShape->create(world.world, instantModelStartPosition, startRot, modelMass);
@@ -273,24 +267,24 @@ void ofApp::update(){
     world.setGravity(worldGravity);
     world.update(ofGetLastFrameTime()*2, 20);
     
-    // erase model which is in out range(z < 0)
+    ofRectangle kinectRange(0, 0, kinectWidth, kinectHeight);
     for( int i = 0; i < assimpModelBulletShapes.size(); i++ ) {
         // FIXME: can not delete assimpModelBulletShapese[0] (maybe better to use shared_ptr. check ofxBullet>SoftBodyMeshExample)
         if (i != 0) {
+            // erase model which is in out range(z < 0)
             if(assimpModelBulletShapes[i]->getPosition().z < 0) {
                 assimpModelBulletShapes[i]->remove();
                 assimpModelBulletShapes.erase(assimpModelBulletShapes.begin() + i);
+                // erase only one bullet shape
                 break;
-            }else{
-                ofRectangle rect(0, 0, w, h);
-                if (rect.inside(assimpModelBulletShapes[i]->getPosition().x, assimpModelBulletShapes[i]->getPosition().y)) {
-                    float kinectDepth = rawDepthPixels[(int)assimpModelBulletShapes[i]->getPosition().x + (int)assimpModelBulletShapes[i]->getPosition().y*w];
-                    if (kinectDepth > kinect.minDistance && kinectDepth < kinect.maxDistance && assimpModelBulletShapes[i]->getPosition().z > kinectDepth) {
-                        // add force to the model which is above the kinect mesh
-                        if (ofGetMousePressed()) {
-                            ofVec3f wind(0, 0, 0.001); // FIXME: hard code
-                            assimpModelBulletShapes[i]->applyCentralForce(wind);
-                        }
+            }else if(kinectIsReady && kinectRange.inside(assimpModelBulletShapes[i]->getPosition().x, assimpModelBulletShapes[i]->getPosition().y)){
+                // apply force to bullet shape inside the
+                float instantKinectDepth = rawDepthPixels[(int)assimpModelBulletShapes[i]->getPosition().x + (int)assimpModelBulletShapes[i]->getPosition().y*kinectWidth];
+                if (instantKinectDepth > kinect.minDistance && instantKinectDepth < kinect.maxDistance && assimpModelBulletShapes[i]->getPosition().z > instantKinectDepth) {
+                    // add force to the model which is above the kinect mesh
+                    if (ofGetMousePressed()) {
+                        ofVec3f wind(0, 0, 0.001); // FIXME: hard code
+                        assimpModelBulletShapes[i]->applyCentralForce(wind);
                     }
                 }
             }
@@ -477,7 +471,11 @@ void ofApp::keyPressed(int key){
             ofToggleFullscreen();
             break;
         case 'h':
+            // show/hide gui panel
             showPanel = !showPanel;
+
+            // show/hide mouse cursor
+            showPanel ? ofShowCursor() : ofHideCursor();
             break;
         case 'm':{
             // add model
@@ -522,8 +520,7 @@ void ofApp::mouseDragged(int x, int y, int button){
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
-    showCursor ? ofHideCursor() : ofShowCursor();
-    showCursor = !showCursor;
+
 }
 
 //--------------------------------------------------------------
