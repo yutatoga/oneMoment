@@ -427,8 +427,17 @@ void ofApp::draw(){
         texRGB.draw(ofGetWidth()-debugImageSize.x-2, debugImageSize.y+5, debugImageSize.x, debugImageSize.y);
     }
     
-    // - info
+    // - info about ofxKinectV2
     //    ofDrawBitmapString("ofxKinectV2: Work in progress addon.\nBased on the excellent work by the OpenKinect libfreenect2 team\n\n-Only supports one Kinect v2 at a time. \n-Requires USB 3.0 port ( superspeed )\n-Requires patched libusb. If you have the libusb from ofxKinect ( v1 ) linked to your project it will prevent superspeed on Kinect V2", 10, 14);
+    
+    // info about shortcut keys
+    if (showPanel) {
+        ofDrawBitmapStringHighlight("press f: toggle full screen", ofGetWidth()-225, ofGetHeight()-90, ofColor::white, ofColor::black);
+        ofDrawBitmapStringHighlight("press h: hide/show GUI     ", ofGetWidth()-225, ofGetHeight()-70, ofColor::white, ofColor::black);
+        ofDrawBitmapStringHighlight("press 1: load sakura model ", ofGetWidth()-225, ofGetHeight()-50, ofColor::white, ofColor::black);
+        ofDrawBitmapStringHighlight("press 2: load DNA model    ", ofGetWidth()-225, ofGetHeight()-30, ofColor::white, ofColor::black);
+        ofDrawBitmapStringHighlight("press w: apply force       ", ofGetWidth()-225, ofGetHeight()-10, ofColor::white, ofColor::black);
+    }
 }
 
 bool ofApp::valueIsInKinectRange(float value){
