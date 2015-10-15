@@ -513,10 +513,10 @@ void ofApp::keyPressed(int key){
         }
             break;
         case '1':
-            reloadAssimpModel(1);
+            changeAssimpModel(1);
             break;
         case '2':
-            reloadAssimpModel(2);
+            changeAssimpModel(2);
             break;
         case 'f':
             ofToggleFullscreen();
