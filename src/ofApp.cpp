@@ -166,7 +166,7 @@ void ofApp::update(){
     }
     dmx.update();
     // FIXME: hard code
-    if (ofGetFrameNum() % 600 == 0){
+    if ((int)ofGetElapsedTimef() % 10 == 0){
         // FIXME: hard code and use same tween to each dmx channel
         for (int i = 0; i < DMX_CHANNEL_NUMBER; i++) {
             doEase(dmxChannels[i], 10000, 0);
