@@ -29,7 +29,8 @@ void ofApp::setup(){
     panel.add(stopUpdatingKinectBullet.set("stopUpdatingKinectBullet", false));
     // - debug
     panel.add(enableDrawDebug.set("enableDrawDebug", true));
-    panel.add(enableDrawWireFrame.set("enableDrawWireFrame", true));
+    panel.add(enableDrawKinectWireFrame.set("enableDrawKinectWireFrame", true));
+    panel.add(enableDrawAssimpModelWireFrame.set("enableDrawAssimpModelWireFrame", false));
     panel.add(hideKinectMesh.set("hideKinectMesh", false));
     panel.add(enableDrawGuideLine.set("enableDrawGuideLine", false));
     panel.add(enableMouseInput.set("enableMouseInput", true));
@@ -348,7 +349,7 @@ void ofApp::draw(){
                         if (!hideKinectMesh) {
                             kinectMesh.setMode(OF_PRIMITIVE_TRIANGLES);
                             glLineWidth(int(1));
-                            enableDrawWireFrame ? kinectMesh.drawWireframe() : kinectMesh.drawFaces();
+                            enableDrawKinectWireFrame ? kinectMesh.drawWireframe() : kinectMesh.drawFaces();
                         }
                         
                         // spheres
@@ -365,7 +366,7 @@ void ofApp::draw(){
                                 for (int i = 0; i < assimpModelBulletShapes.size(); i++) {
                                     assimpModelBulletShapes[i]->transformGL();{
                                         ofScale(scale.x, scale.y, scale.z);
-                                        assimpModelLoader.getCurrentAnimatedMesh(0).drawFaces();
+                                        enableDrawAssimpModelWireFrame ? assimpModelLoader.getCurrentAnimatedMesh(0).drawWireframe() : assimpModelLoader.getCurrentAnimatedMesh(0).drawFaces();
                                     } assimpModelBulletShapes[i]->restoreTransformGL();
                                 }
                             // }assimpModelMaterial.end();
@@ -488,6 +489,9 @@ void ofApp::changeAssimpModel(int modelId){
         case 2:
             assimpModelLoader.loadModel("dna/DNA_06.obj", true);
             break;
+        case 3:
+            assimpModelLoader.loadModel("bitcoin1/bitcoin1.3ds", true);
+            break;
         default:
             break;
     }
@@ -527,10 +531,19 @@ void ofApp::keyPressed(int key){
         }
             break;
         case '1':
+            // sakura
+            enableDrawAssimpModelWireFrame = false;
             changeAssimpModel(1);
             break;
         case '2':
+            // dna
+            enableDrawAssimpModelWireFrame = false;
             changeAssimpModel(2);
+            break;
+        case '3':
+            // bitcoin
+            enableDrawAssimpModelWireFrame = true;
+            changeAssimpModel(3);
             break;
         case 'f':
             ofToggleFullscreen();

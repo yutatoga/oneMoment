@@ -44,7 +44,8 @@ public:
     ofParameter<int> step;
     ofParameter<bool> stopUpdatingKinectBullet;
     ofParameter<bool> enableDrawDebug;
-    ofParameter<bool> enableDrawWireFrame;
+    ofParameter<bool> enableDrawKinectWireFrame;
+    ofParameter<bool> enableDrawAssimpModelWireFrame;
     ofParameter<bool> hideKinectMesh;
     ofParameter<bool> enableDrawGuideLine;
     ofParameter<bool> enableMouseInput;
