@@ -32,6 +32,7 @@
 	<cameraFov>60</cameraFov>
 	<cameraNearDist>60</cameraNearDist>
 	<cameraFarDist>6651.07</cameraFarDist>
-<DMX_Channel_1>255</DMX_Channel_1>
+<DMX_Channel_1>127</DMX_Channel_1>
 <disableKinect>0</disableKinect>
+<DMX_Channel_2>127</DMX_Channel_2>
 </distance_in_mm>

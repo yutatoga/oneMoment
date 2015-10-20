@@ -36,7 +36,9 @@ void ofApp::setup(){
     panel.add(enableDrawDebugSpheres.set("enableDrawDebugSpheres", false));
     panel.add(reset.setup("reset"));
     // - dmx
-    panel.add(dmxChannel1.set("DMX Channel 1", 127, 0, 255));
+    for (int i = 0; i < DMX_CHANNEL_NUMBER; i++) {
+        panel.add(dmxChannels[i].set("DMX Channel "+ofToString(i+1), 127, 0, 255));
+    }
     // - light
     panel.add(lightSpecularColor.set("lightSpecularColor", ofFloatColor::red, ofFloatColor::black, ofFloatColor::white));
     panel.add(lightDissuseColor.set("lightDiffuseColor", ofFloatColor::green, ofFloatColor::black, ofFloatColor::white));
@@ -156,15 +158,18 @@ void ofApp::setupWhenKinectIsReady(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
-    
-    
     // dmx
-    dmxChannel1.set(tween.update());
-    dmx.setLevel(1, dmxChannel1);
+    for (int i = 0; i < DMX_CHANNEL_NUMBER; i++) {
+        dmxChannels[i].set(tween.update());
+        dmx.setLevel(i+1, dmxChannels[i]);// be careful, dmx channel starts from 1, not 0.
+    }
     dmx.update();
     // FIXME: hard code
     if (ofGetFrameNum() % 600 == 0){
-        doEase(10000, 0);
+        // FIXME: hard code and use same tween to each dmx channel
+        for (int i = 0; i < DMX_CHANNEL_NUMBER; i++) {
+            doEase(dmxChannels[i], 10000, 0);
+        }
     }
     
     // kinect
@@ -454,12 +459,12 @@ void ofApp::enableSmoothLightingChanged(bool &enableSmoothLightingStatus){
     ofSetSmoothLighting(enableSmoothLighting);
 }
 
-void ofApp::doEase(unsigned duration, unsigned delay){
-    if (dmxChannel1 == 0) {
+void ofApp::doEase(ofParameter<int> dmxChannel, unsigned duration, unsigned delay){
+    if (dmxChannel == 0) {
         // ease in
         tween.setParameters(1, easingSine, ofxTween::easeIn, 0, 255, duration, delay);
     }
-    if (dmxChannel1 == 255) {
+    if (dmxChannel == 255) {
         tween.setParameters(1, easingSine, ofxTween::easeIn, 255, 0, duration, delay);
     }
 }

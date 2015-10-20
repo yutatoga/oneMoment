@@ -1,5 +1,7 @@
 #pragma once
 
+#define DMX_CHANNEL_NUMBER 2
+
 #include "ofMain.h"
 #include "ofxKinectV2.h"
 #include "ofxGui.h"
@@ -28,7 +30,7 @@ public:
     
     void setupWhenKinectIsReady();
     bool valueIsInKinectRange(float value);
-    void doEase(unsigned duration, unsigned delay);
+    void doEase(ofParameter<int> dmxChannel, unsigned duration, unsigned delay);
     void changeAssimpModel(int modelId);
     // listener
     void resetPressed();
@@ -74,7 +76,7 @@ public:
     ofParameter<ofVec3f> modelStartPosition;
     ofParameter<float> modelMass;
     // - dmx
-    ofParameter<int> dmxChannel1;
+    ofParameter<int> dmxChannels[DMX_CHANNEL_NUMBER];
     // - reset
     ofxButton reset;
     
