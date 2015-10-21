@@ -37,6 +37,7 @@ public:
     void resetPressed();
     void enableSmoothLightingChanged(bool &enableSmoothLightingStatus);
     void enableScanPeopleChanged(bool &enableScanPeople);
+    void saveReferenceDepthPixelsPressed();
     
     // gui
     ofxPanel panel;
@@ -82,6 +83,7 @@ public:
     ofParameter<int> dmxChannels[DMX_CHANNEL_NUMBER];
     // - scanning cloth or scanning people
     ofParameter<bool> enableScanPeople;
+    ofxButton saveReferenceDepthPixels;
     // - reset
     ofxButton reset;
     
@@ -90,6 +92,8 @@ public:
     ofTexture texDepth;
     ofTexture texRGB;
     ofFloatPixels rawDepthPixels;
+    ofTexture savedReferenceDepthTexture;
+    ofFloatPixels savedReferenceDepthPixels;
     ofMesh kinectMesh;
     int kinectWidth;
     int kinectHeight;

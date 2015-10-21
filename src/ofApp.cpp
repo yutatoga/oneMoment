@@ -19,6 +19,7 @@ void ofApp::setup(){
     reset.addListener(this, &ofApp::resetPressed);
     enableSmoothLighting.addListener(this, &ofApp::enableSmoothLightingChanged);
     enableScanPeople.addListener(this, &ofApp::enableScanPeopleChanged);
+    saveReferenceDepthPixels.addListener(this, &ofApp::saveReferenceDepthPixelsPressed);
     
     // gui
     showPanel = true;
@@ -37,6 +38,7 @@ void ofApp::setup(){
     panel.add(enableMouseInput.set("enableMouseInput", true));
     panel.add(enableDrawDebugSpheres.set("enableDrawDebugSpheres", false));
     panel.add(enableScanPeople.set("enableScanPeople", false));
+    panel.add(saveReferenceDepthPixels.setup("saveReferenceDepth"));
     panel.add(reset.setup("reset"));
     // - dmx
     for (int i = 0; i < DMX_CHANNEL_NUMBER; i++) {
@@ -147,7 +149,9 @@ void ofApp::setupWhenKinectIsReady(){
     kinectWidth = rawDepthPixels.getWidth();
     kinectHeight = rawDepthPixels.getHeight();
     kinectDepth = (int)kinect.maxDistance.getMax();
-
+    savedReferenceDepthPixels = rawDepthPixels;
+    savedReferenceDepthTexture.loadData(kinect.getDepthPixels()); // be careful, this is not raw depth pixels
+    
     // init kinectBulletShape
     if (kinectBulletShape == NULL) {
         kinectBulletShape = shared_ptr< ofxBulletTriMeshShape >( new ofxBulletTriMeshShape() );
@@ -186,6 +190,7 @@ void ofApp::update(){
         
         if (enableScanPeople) {
             // FIXME: WIP - scan people and do something
+            
         }else{
             updateKinectMesh();
         }
@@ -443,6 +448,13 @@ void ofApp::draw(){
         texRGB.draw(ofGetWidth()-debugImageSize.x-2, debugImageSize.y+5, debugImageSize.x, debugImageSize.y);
     }
     
+    // - saved reference depth pixels
+    if (showPanel) {
+        // draw upper right corner
+        ofRect(ofGetWidth()-debugImageSize.x-3, debugImageSize.y*2+7, debugImageSize.x+2, debugImageSize.y+2);
+        savedReferenceDepthTexture.draw(ofGetWidth()-debugImageSize.x-2, debugImageSize.y*2+8, debugImageSize.x, debugImageSize.y);
+    }
+    
     // - info about ofxKinectV2
     //    ofDrawBitmapString("ofxKinectV2: Work in progress addon.\nBased on the excellent work by the OpenKinect libfreenect2 team\n\n-Only supports one Kinect v2 at a time. \n-Requires USB 3.0 port ( superspeed )\n-Requires patched libusb. If you have the libusb from ofxKinect ( v1 ) linked to your project it will prevent superspeed on Kinect V2", 10, 14);
     
@@ -482,6 +494,11 @@ void ofApp::enableScanPeopleChanged(bool &enableScanPeople){
             setupWhenKinectIsReady();
         }
     }
+}
+
+void ofApp::saveReferenceDepthPixelsPressed(){
+    savedReferenceDepthPixels = kinect.getRawDepthPixels();
+    savedReferenceDepthTexture.loadData(kinect.getDepthPixels()); // be careful, this is NOT raw depth pixels
 }
 
 void ofApp::doEase(ofParameter<int> dmxChannel, unsigned duration, unsigned delay){
