@@ -195,20 +195,30 @@ void ofApp::update(){
                 diffDepthTexturePixels = new unsigned char[rawDepthPixels.getWidth()*rawDepthPixels.getHeight()*3];
             }
             diffDepthPixels = rawDepthPixels; // copy
-            float * depthPixels = diffDepthPixels.getPixels();
+            float * diffDepthPixelsPointer = diffDepthPixels.getPixels();
             for (int x = 0; x < rawDepthPixels.getWidth(); x++) {
                 for (int y = 0; y < rawDepthPixels.getHeight(); y++) {
-                    depthPixels[rawDepthPixels.getWidth()*y+x] = savedReferenceDepthPixels[rawDepthPixels.getWidth()*y+x]-diffDepthPixels[rawDepthPixels.getWidth()*y+x];
-                    if (depthPixels[rawDepthPixels.getWidth()*y+x] > 0) {
-                        // red
-                        diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+0] = savedReferenceDepthPixels[rawDepthPixels.getWidth()*y+x]-diffDepthPixels[rawDepthPixels.getWidth()*y+x]; // r
-                        diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+1] = 0; // g
-                        diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+2] = 0; // b
+                    diffDepthPixelsPointer[rawDepthPixels.getWidth()*y+x] = savedReferenceDepthPixels[rawDepthPixels.getWidth()*y+x]-rawDepthPixels[rawDepthPixels.getWidth()*y+x];
+                    if (/* savedReferenceDepthPixels[rawDepthPixels.getWidth()*y+x] > kinect.minDistance && savedReferenceDepthPixels[rawDepthPixels.getWidth()*y+x] < kinect.maxDistance && */
+                        rawDepthPixels[rawDepthPixels.getWidth()*y+x] > kinect.minDistance && rawDepthPixels[rawDepthPixels.getWidth()*y+x] < kinect.maxDistance) {
+                        if (diffDepthPixelsPointer[rawDepthPixels.getWidth()*y+x] > 0) {
+                            // red
+                            diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+0] = ofMap(diffDepthPixelsPointer[rawDepthPixels.getWidth()*y+x],
+                                                                                                0, kinect.maxDistance-kinect.minDistance, 0, 255, true) ; // r
+                            diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+1] = 0; // g
+                            diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+2] = 0; // b
+                        }else{
+                            // blue
+                            diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+0] = 0; // r
+                            diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+1] = 0; // g
+                            diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+2] = ofMap(-1*diffDepthPixelsPointer[rawDepthPixels.getWidth()*y+x],
+                                                                                                0, kinect.maxDistance-kinect.minDistance, 0, 255, true); // b
+                        }
                     }else{
-                        // blue
+                        // black
                         diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+0] = 0; // r
                         diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+1] = 0; // g
-                        diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+2] = -1*savedReferenceDepthPixels[rawDepthPixels.getWidth()*y+x]-diffDepthPixels[rawDepthPixels.getWidth()*y+x]; // b
+                        diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+2] = 0; // b
                     }
                 }
             }
