@@ -189,8 +189,13 @@ void ofApp::update(){
         rawDepthPixels = kinect.getRawDepthPixels();
         
         if (enableScanPeople) {
-            // FIXME: WIP - scan people and do something
-            
+            // scanning people feature
+            diffDepthPixels = rawDepthPixels;
+            float * depthPixels = diffDepthPixels.getPixels();
+            for (int i = 0; i < diffDepthPixels.size(); i++) {
+                depthPixels[i] = savedReferenceDepthPixels[i]-diffDepthPixels[i];
+            }
+            diffDepthTexture.loadData(diffDepthPixels);
         }else{
             updateKinectMesh();
         }
@@ -453,6 +458,13 @@ void ofApp::draw(){
         // draw upper right corner
         ofRect(ofGetWidth()-debugImageSize.x-3, debugImageSize.y*2+7, debugImageSize.x+2, debugImageSize.y+2);
         savedReferenceDepthTexture.draw(ofGetWidth()-debugImageSize.x-2, debugImageSize.y*2+8, debugImageSize.x, debugImageSize.y);
+    }
+    
+    // - diff depth
+    if (showPanel) {
+        // draw upper right corner
+        ofRect(ofGetWidth()-debugImageSize.x-3, debugImageSize.y*3+10, debugImageSize.x+2, debugImageSize.y+2);
+        diffDepthTexture.draw(ofGetWidth()-debugImageSize.x-2, debugImageSize.y*3+11, debugImageSize.x, debugImageSize.y);
     }
     
     // - info about ofxKinectV2

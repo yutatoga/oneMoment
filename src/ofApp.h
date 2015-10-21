@@ -94,6 +94,8 @@ public:
     ofFloatPixels rawDepthPixels;
     ofTexture savedReferenceDepthTexture;
     ofFloatPixels savedReferenceDepthPixels;
+    ofFloatPixels diffDepthPixels;
+    ofTexture diffDepthTexture;
     ofMesh kinectMesh;
     int kinectWidth;
     int kinectHeight;
