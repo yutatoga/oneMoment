@@ -96,6 +96,7 @@ public:
     ofFloatPixels savedReferenceDepthPixels;
     ofFloatPixels diffDepthPixels;
     ofTexture diffDepthTexture;
+    unsigned char *diffDepthTexturePixels;
     ofMesh kinectMesh;
     int kinectWidth;
     int kinectHeight;

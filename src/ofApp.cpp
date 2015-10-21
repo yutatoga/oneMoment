@@ -190,12 +190,33 @@ void ofApp::update(){
         
         if (enableScanPeople) {
             // scanning people feature
-            diffDepthPixels = rawDepthPixels;
-            float * depthPixels = diffDepthPixels.getPixels();
-            for (int i = 0; i < diffDepthPixels.size(); i++) {
-                depthPixels[i] = savedReferenceDepthPixels[i]-diffDepthPixels[i];
+            if (!diffDepthTexture.isAllocated()) {
+                diffDepthTexture.allocate(rawDepthPixels.getWidth(), rawDepthPixels.getHeight(), GL_RGB);// color texture
+                diffDepthTexturePixels = new unsigned char[rawDepthPixels.getWidth()*rawDepthPixels.getHeight()*3];
             }
-            diffDepthTexture.loadData(diffDepthPixels);
+            diffDepthPixels = rawDepthPixels; // copy
+            float * depthPixels = diffDepthPixels.getPixels();
+            for (int x = 0; x < rawDepthPixels.getWidth(); x++) {
+                for (int y = 0; y < rawDepthPixels.getHeight(); y++) {
+                    depthPixels[rawDepthPixels.getWidth()*y+x] = savedReferenceDepthPixels[rawDepthPixels.getWidth()*y+x]-diffDepthPixels[rawDepthPixels.getWidth()*y+x];
+                    if (depthPixels[rawDepthPixels.getWidth()*y+x] > 0) {
+                        // red
+                        diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+0] = savedReferenceDepthPixels[rawDepthPixels.getWidth()*y+x]-diffDepthPixels[rawDepthPixels.getWidth()*y+x]; // r
+                        diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+1] = 0; // g
+                        diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+2] = 0; // b
+                    }else{
+                        // blue
+                        diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+0] = 0; // r
+                        diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+1] = 0; // g
+                        diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+2] = -1*savedReferenceDepthPixels[rawDepthPixels.getWidth()*y+x]-diffDepthPixels[rawDepthPixels.getWidth()*y+x]; // b
+                    }
+                }
+            }
+            // grayscale diff texture
+            // diffDepthTexture.loadData(diffDepthPixels);
+            
+            // draw RGB diff texture
+            diffDepthTexture.loadData(diffDepthTexturePixels, rawDepthPixels.getWidth(), rawDepthPixels.getHeight(), GL_RGB);
         }else{
             updateKinectMesh();
         }
