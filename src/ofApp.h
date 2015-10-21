@@ -32,10 +32,12 @@ public:
     bool valueIsInKinectRange(float value);
     void doEase(ofParameter<int> dmxChannel, unsigned duration, unsigned delay);
     void changeAssimpModel(int modelId);
+    void updateKinectMesh();
     // listener
     void resetPressed();
     void enableSmoothLightingChanged(bool &enableSmoothLightingStatus);
-
+    void enableScanPeopleChanged(bool &enableScanPeople);
+    
     // gui
     ofxPanel panel;
     bool showPanel;
@@ -78,6 +80,8 @@ public:
     ofParameter<float> modelMass;
     // - dmx
     ofParameter<int> dmxChannels[DMX_CHANNEL_NUMBER];
+    // - scanning cloth or scanning people
+    ofParameter<bool> enableScanPeople;
     // - reset
     ofxButton reset;
     

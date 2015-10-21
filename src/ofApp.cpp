@@ -18,6 +18,7 @@ void ofApp::setup(){
     // listener
     reset.addListener(this, &ofApp::resetPressed);
     enableSmoothLighting.addListener(this, &ofApp::enableSmoothLightingChanged);
+    enableScanPeople.addListener(this, &ofApp::enableScanPeopleChanged);
     
     // gui
     showPanel = true;
@@ -35,6 +36,7 @@ void ofApp::setup(){
     panel.add(enableDrawGuideLine.set("enableDrawGuideLine", false));
     panel.add(enableMouseInput.set("enableMouseInput", true));
     panel.add(enableDrawDebugSpheres.set("enableDrawDebugSpheres", false));
+    panel.add(enableScanPeople.set("enableScanPeople", false));
     panel.add(reset.setup("reset"));
     // - dmx
     for (int i = 0; i < DMX_CHANNEL_NUMBER; i++) {
@@ -147,7 +149,9 @@ void ofApp::setupWhenKinectIsReady(){
     kinectDepth = (int)kinect.maxDistance.getMax();
 
     // init kinectBulletShape
-    kinectBulletShape = shared_ptr< ofxBulletTriMeshShape >( new ofxBulletTriMeshShape() );
+    if (kinectBulletShape == NULL) {
+        kinectBulletShape = shared_ptr< ofxBulletTriMeshShape >( new ofxBulletTriMeshShape() );
+    }
     kinectBulletShape->create( world.world, kinectMesh, ofVec3f(0,0,0), 0.f, ofVec3f(0, 0, 0), ofVec3f(kinectWidth, kinectHeight, kinect.maxDistance.getMax()) );
     kinectBulletShape->add();
     kinectBulletShape->enableKinematic();
@@ -180,40 +184,11 @@ void ofApp::update(){
         texRGB.loadData(kinect.getRgbPixels());
         rawDepthPixels = kinect.getRawDepthPixels();
         
-        // mesh
-        kinectMesh.clear();
-        
-        // add vertex to mesh and save indexes
-        vector< vector<int> > indexes;
-        int id = 0;
-        for (int y = 0; y < kinectHeight; y += step) {
-            vector<int> tempVector;
-            for (int x = 0; x < kinectWidth; x += step) {
-                float distance = rawDepthPixels[x+y*kinectWidth];
-                kinectMesh.addVertex(ofVec3f(x, y, distance));
-                if (distance > kinect.minDistance && distance < kinect.maxDistance) {
-                    tempVector.push_back(id);
-                }else{
-                    tempVector.push_back(-1); // set -1 for out of range
-                }
-                id++;
-            }
-            indexes.push_back(tempVector);
+        if (enableScanPeople) {
+            // FIXME: WIP - scan people and do something
+        }else{
+            updateKinectMesh();
         }
-        
-        // set triangle
-        for (int y = 0; y < kinectHeight-step; y += step) {
-            for (int x = 0; x < kinectWidth-step; x += step) {
-                if (indexes[y/step][x/step] != -1 &&
-                    indexes[y/step][x/step+1] !=  -1 &&
-                    indexes[y/step+1][x/step+1] != -1 &&
-                    indexes[y/step+1][x/step] != -1) {
-                    kinectMesh.addTriangle(indexes[y/step][x/step], indexes[y/step][x/step+1], indexes[y/step+1][x/step+1]);
-                    kinectMesh.addTriangle(indexes[y/step][x/step], indexes[y/step+1][x/step+1], indexes[y/step+1][x/step]);
-                }
-            }
-        }
-        
         // bullet
         if (kinectBulletShape == NULL ) {
             setupWhenKinectIsReady();
@@ -221,7 +196,7 @@ void ofApp::update(){
     }
     
     // bullet
-    if (!stopUpdatingKinectBullet) {
+    if (!stopUpdatingKinectBullet && !enableScanPeople) {
         if (kinectHeight != 0 && kinectBulletShape != NULL) {
             kinectBulletShape->remove();
             kinectBulletShape->create( world.world, kinectMesh, ofVec3f(0,0,0), 0.f, ofVec3f(0, 0, 0), ofVec3f(kinectWidth, kinectHeight, kinect.maxDistance.getMax()) );
@@ -325,6 +300,41 @@ void ofApp::update(){
     material.setAmbientColor(materialAmbientColor);
     material.setEmissiveColor(materialEmissiveColor);
     material.setShininess(materialShininess);
+}
+
+void ofApp::updateKinectMesh(){
+    kinectMesh.clear();
+    
+    // add vertex to mesh and save indexes
+    vector< vector<int> > indexes;
+    int id = 0;
+    for (int y = 0; y < kinectHeight; y += step) {
+        vector<int> tempVector;
+        for (int x = 0; x < kinectWidth; x += step) {
+            float distance = rawDepthPixels[x+y*kinectWidth];
+            kinectMesh.addVertex(ofVec3f(x, y, distance));
+            if (distance > kinect.minDistance && distance < kinect.maxDistance) {
+                tempVector.push_back(id);
+            }else{
+                tempVector.push_back(-1); // set -1 for out of range
+            }
+            id++;
+        }
+        indexes.push_back(tempVector);
+    }
+    
+    // set triangle
+    for (int y = 0; y < kinectHeight-step; y += step) {
+        for (int x = 0; x < kinectWidth-step; x += step) {
+            if (indexes[y/step][x/step] != -1 &&
+                indexes[y/step][x/step+1] !=  -1 &&
+                indexes[y/step+1][x/step+1] != -1 &&
+                indexes[y/step+1][x/step] != -1) {
+                kinectMesh.addTriangle(indexes[y/step][x/step], indexes[y/step][x/step+1], indexes[y/step+1][x/step+1]);
+                kinectMesh.addTriangle(indexes[y/step][x/step], indexes[y/step+1][x/step+1], indexes[y/step+1][x/step]);
+            }
+        }
+    }
 }
 
 //--------------------------------------------------------------
@@ -458,6 +468,20 @@ void ofApp::resetPressed(){
 
 void ofApp::enableSmoothLightingChanged(bool &enableSmoothLightingStatus){
     ofSetSmoothLighting(enableSmoothLighting);
+}
+
+void ofApp::enableScanPeopleChanged(bool &enableScanPeople){
+    if (enableScanPeople) {
+        kinectMesh.clear();
+        if (kinectBulletShape != NULL) {
+            kinectBulletShape->remove();
+        }
+    }else{
+        if(kinect.getDepthPixels().getWidth() != 0){
+            updateKinectMesh();
+            setupWhenKinectIsReady();
+        }
+    }
 }
 
 void ofApp::doEase(ofParameter<int> dmxChannel, unsigned duration, unsigned delay){
