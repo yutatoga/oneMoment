@@ -1,6 +1,9 @@
 #pragma once
 
 #define DMX_CHANNEL_NUMBER 2
+#define TIMER_PER_SECONDS 10
+#define PROBABILITY_FACTOR_MIN_FACTOR 0.1
+#define PROBABILITY_FACTOR_MAX_FACTOR 1000
 
 #include "ofMain.h"
 #include "ofxKinectV2.h"
@@ -84,6 +87,7 @@ public:
     // - scanning cloth or scanning people
     ofParameter<bool> enableScanPeople;
     ofxButton saveReferenceDepthPixels;
+    ofParameter<float> probabilityFactor;
     // - reset
     ofxButton reset;
     
@@ -113,6 +117,7 @@ public:
     shared_ptr<ofxBulletTriMeshShape> kinectBulletShape;
     vector<shared_ptr<ofxBulletSphere> > spheres;
     vector<ofxBulletCustomShape*> assimpModelBulletShapes;
+    vector<ofVec3f> modelStartPositions;
     
     // light
     ofLight light;

@@ -39,6 +39,7 @@ void ofApp::setup(){
     panel.add(enableDrawDebugSpheres.set("enableDrawDebugSpheres", false));
     panel.add(enableScanPeople.set("enableScanPeople", false));
     panel.add(saveReferenceDepthPixels.setup("saveReferenceDepth"));
+    panel.add(probabilityFactor.set("probabilityFactor", kinect.maxDistance, 1*PROBABILITY_FACTOR_MIN_FACTOR, kinect.maxDistance.getMax()*PROBABILITY_FACTOR_MAX_FACTOR));
     panel.add(reset.setup("reset"));
     // - dmx
     for (int i = 0; i < DMX_CHANNEL_NUMBER; i++) {
@@ -148,6 +149,7 @@ void ofApp::setup(){
 void ofApp::setupWhenKinectIsReady(){
     kinectWidth = rawDepthPixels.getWidth();
     kinectHeight = rawDepthPixels.getHeight();
+    
     kinectDepth = (int)kinect.maxDistance.getMax();
     savedReferenceDepthPixels = rawDepthPixels;
     savedReferenceDepthTexture.loadData(kinect.getDepthPixels()); // be careful, this is not raw depth pixels
@@ -173,8 +175,7 @@ void ofApp::update(){
         dmx.setLevel(i+1, dmxChannels[i]);// be careful, dmx channel starts from 1, not 0.
     }
     dmx.update();
-    // FIXME: hard code
-    if ((int)ofGetElapsedTimef() % 10 == 0){
+    if ((int)ofGetElapsedTimef() % TIMER_PER_SECONDS == 0){
         // FIXME: hard code and use same tween to each dmx channel
         for (int i = 0; i < DMX_CHANNEL_NUMBER; i++) {
             doEase(dmxChannels[i], 10000, 0);
@@ -196,19 +197,28 @@ void ofApp::update(){
             }
             diffDepthPixels = rawDepthPixels; // copy
             float * diffDepthPixelsPointer = diffDepthPixels.getPixels();
+            modelStartPositions.clear();
             for (int x = 0; x < rawDepthPixels.getWidth(); x++) {
                 for (int y = 0; y < rawDepthPixels.getHeight(); y++) {
                     diffDepthPixelsPointer[rawDepthPixels.getWidth()*y+x] = savedReferenceDepthPixels[rawDepthPixels.getWidth()*y+x]-rawDepthPixels[rawDepthPixels.getWidth()*y+x];
                     if (/* savedReferenceDepthPixels[rawDepthPixels.getWidth()*y+x] > kinect.minDistance && savedReferenceDepthPixels[rawDepthPixels.getWidth()*y+x] < kinect.maxDistance && */
                         rawDepthPixels[rawDepthPixels.getWidth()*y+x] > kinect.minDistance && rawDepthPixels[rawDepthPixels.getWidth()*y+x] < kinect.maxDistance) {
                         if (diffDepthPixelsPointer[rawDepthPixels.getWidth()*y+x] > 0) {
-                            // red
+                            // calculate probability
+                            float probability = diffDepthPixelsPointer[rawDepthPixels.getWidth()*y+x] / probabilityFactor;
+                            // judge add or not
+                            bool judgeAdd = (ofRandomuf() < probability);
+                            if (judgeAdd) {
+                                modelStartPositions.push_back(ofVec3f(x, y, modelStartPosition->z));
+                            }
+                            
+                            // set diffDepthTexturePixels with red color
                             diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+0] = ofMap(diffDepthPixelsPointer[rawDepthPixels.getWidth()*y+x],
                                                                                                 0, kinect.maxDistance-kinect.minDistance, 0, 255, true) ; // r
                             diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+1] = 0; // g
                             diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+2] = 0; // b
                         }else{
-                            // blue
+                            // set diffDepthTexturePixels with blue color
                             diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+0] = 0; // r
                             diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+1] = 0; // g
                             diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+2] = ofMap(-1*diffDepthPixelsPointer[rawDepthPixels.getWidth()*y+x],
@@ -275,8 +285,6 @@ void ofApp::update(){
 //        float instantRadius = (ofRandom(-500, 500)+ofRandom(-500, 500)+ofRandom(-500, 500)+ofRandom(-500, 500)+ofRandom(-500, 500))/5.0;
         float instantTheta = ofRandom(-PI, PI);
         ofVec3f instantModelStartPosition(kinectWidth/2.0+instantRadius*cos(instantTheta), kinectHeight/2.0+instantRadius*sin(instantTheta), modelStartPosition->z);
-
-
         bulletCustomShape->create(world.world, instantModelStartPosition, startRot, modelMass);
         bulletCustomShape->add();
         ofVec3f frc(camera.getLookAtDir());
@@ -286,6 +294,25 @@ void ofApp::update(){
         bulletCustomShape->applyTorque(instantTorque);
         assimpModelBulletShapes.push_back(bulletCustomShape);
     }
+    if (enableScanPeople) {
+        // add models in modelStartPositioins
+        ofLogNotice("modelStartPositions"+ofToString(modelStartPositions.size()));
+        for (int i = 0; i < modelStartPositions.size(); i++) {
+            // add model in random x, random y and modelStartPosition.z
+            ofxBulletCustomShape *bulletCustomShape;
+            bulletCustomShape = new ofxBulletCustomShape;
+            ofQuaternion startRot = ofQuaternion(ofRandom(0, 1), ofRandom(0, 1), ofRandom(0, 1), ofRandom(-1*PI, PI));
+            bulletCustomShape->init((btCompoundShape*)assimpModelBulletShapes[0]->getCollisionShape(), assimpModelBulletShapes[0]->getCentroid());
+            bulletCustomShape->create(world.world, modelStartPositions[i], startRot, modelMass);
+            bulletCustomShape->add();
+            ofVec3f frc(camera.getLookAtDir());
+            frc.normalize();
+            bulletCustomShape->applyCentralForce(frc*ofRandom(-0.01, 0.01));
+            ofVec3f instantTorque(ofRandom(-0.005, 0.005), ofRandom(-0.005, 0.005), ofRandom(-0.005, 0.005));
+            bulletCustomShape->applyTorque(instantTorque);
+            assimpModelBulletShapes.push_back(bulletCustomShape);
+        }
+    }
     
     // world
     world.setGravity(worldGravity);
@@ -293,7 +320,7 @@ void ofApp::update(){
     
     ofRectangle kinectRange(0, 0, kinectWidth, kinectHeight);
     for( int i = 0; i < assimpModelBulletShapes.size(); i++ ) {
-        // FIXME: can not delete assimpModelBulletShapese[0] (maybe better to use shared_ptr. check ofxBullet>SoftBodyMeshExample)
+        // FIXME: can not delete assimpModelBulletShapes[0] (maybe better to use shared_ptr. check ofxBullet>SoftBodyMeshExample)
         if (i != 0) {
             // erase model which is in out range(z < 0)
             if(assimpModelBulletShapes[i]->getPosition().z < 0) {
@@ -301,6 +328,7 @@ void ofApp::update(){
                 assimpModelBulletShapes.erase(assimpModelBulletShapes.begin() + i);
                 // erase only one bullet shape
                 break;
+                
             }else if(kinectIsReady && kinectRange.inside(assimpModelBulletShapes[i]->getPosition().x, assimpModelBulletShapes[i]->getPosition().y)){
                 // apply force to bullet shape inside the
                 float instantKinectDepth = rawDepthPixels[(int)assimpModelBulletShapes[i]->getPosition().x + (int)assimpModelBulletShapes[i]->getPosition().y*kinectWidth];
