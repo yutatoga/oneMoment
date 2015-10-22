@@ -577,7 +577,7 @@ void ofApp::changeAssimpModel(int modelId){
             assimpModelLoader.loadModel("models/bitcoin/bitcoin1/bitcoin1.3ds", true);
             break;
         case 4:
-            assimpModelLoader.loadModel("models/bitcoin/bitcoin2/bit.3ds", true);
+            assimpModelLoader.loadModel("models/bitcoin/bitcoin3/one_sideBit_V01.3ds", true);
             break;
         default:
             break;
