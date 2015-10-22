@@ -94,7 +94,7 @@ void ofApp::setup(){
     
     // model
     ofVec3f scale(1.0, 1.0, 1.0);
-    assimpModelLoader.loadModel("sakura2/sakura2.3ds", true);
+    assimpModelLoader.loadModel("models/sakura/sakura2/sakura2.3ds", true);
     assimpModelLoader.setPosition(ofGetWidth()/2, ofGetHeight()/2, 0);
     assimpModelLoader.setScale(scale.x, scale.y, scale.z);
     ofQuaternion startRot = ofQuaternion(1., 0., 0., PI);
@@ -102,8 +102,8 @@ void ofApp::setup(){
     for (int i = 0; i < assimpModelBulletShapes.size(); i++) {
         assimpModelBulletShapes[i] = new ofxBulletCustomShape;
         if (i == 0) {
-            for (int i = 0; i < assimpModelLoader.getNumMeshes(); i++) {
-                assimpModelBulletShapes[i]->addMesh(assimpModelLoader.getMesh(i), scale, true);
+            for (int j = 0; j < assimpModelLoader.getNumMeshes(); j++) {
+                assimpModelBulletShapes[i]->addMesh(assimpModelLoader.getMesh(j), scale, true);
             }
         } else {
             assimpModelBulletShapes[i]->init((btCompoundShape*)assimpModelBulletShapes[0]->getCollisionShape(), assimpModelBulletShapes[0]->getCentroid());
@@ -568,13 +568,16 @@ void ofApp::changeAssimpModel(int modelId){
     // select model by modelId
     switch (modelId) {
         case 1:
-            assimpModelLoader.loadModel("sakura2/sakura2.3ds", true);
+            assimpModelLoader.loadModel("models/sakura/sakura2/sakura2.3ds", true);
             break;
         case 2:
-            assimpModelLoader.loadModel("dna/DNA_06.obj", true);
+            assimpModelLoader.loadModel("models/dna/dna2/dna.3ds", true);
             break;
         case 3:
-            assimpModelLoader.loadModel("bitcoin1/bitcoin1.3ds", true);
+            assimpModelLoader.loadModel("models/bitcoin/bitcoin1/bitcoin1.3ds", true);
+            break;
+        case 4:
+            assimpModelLoader.loadModel("models/bitcoin/bitcoin2/bit.3ds", true);
             break;
         default:
             break;
@@ -588,8 +591,8 @@ void ofApp::changeAssimpModel(int modelId){
     for (int i = 0; i < assimpModelBulletShapes.size(); i++) {
         assimpModelBulletShapes[i] = new ofxBulletCustomShape;
         if (i == 0) {
-            for (int i = 0; i < assimpModelLoader.getNumMeshes(); i++) {
-                assimpModelBulletShapes[i]->addMesh(assimpModelLoader.getMesh(i), scale, true);
+            for (int j = 0; j < assimpModelLoader.getNumMeshes(); j++) {
+                assimpModelBulletShapes[i]->addMesh(assimpModelLoader.getMesh(j), scale, true);
             }
         } else {
             assimpModelBulletShapes[i]->init((btCompoundShape*)assimpModelBulletShapes[0]->getCollisionShape(), assimpModelBulletShapes[0]->getCentroid());
@@ -628,6 +631,11 @@ void ofApp::keyPressed(int key){
             // bitcoin
             enableDrawAssimpModelWireFrame = true;
             changeAssimpModel(3);
+            break;
+        case '4':
+            // test model
+            enableDrawAssimpModelWireFrame = false;
+            changeAssimpModel(4);
             break;
         case 'f':
             ofToggleFullscreen();
