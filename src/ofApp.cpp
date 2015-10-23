@@ -327,8 +327,7 @@ void ofApp::update(){
                 assimpModelBulletShapes[i]->remove();
                 assimpModelBulletShapes.erase(assimpModelBulletShapes.begin() + i);
                 // erase only one bullet shape
-                break;
-                
+                // break;
             }else if(kinectIsReady && kinectRange.inside(assimpModelBulletShapes[i]->getPosition().x, assimpModelBulletShapes[i]->getPosition().y)){
                 // apply force to bullet shape inside the
                 float instantKinectDepth = rawDepthPixels[(int)assimpModelBulletShapes[i]->getPosition().x + (int)assimpModelBulletShapes[i]->getPosition().y*kinectWidth];
