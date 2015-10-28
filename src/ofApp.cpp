@@ -668,7 +668,7 @@ void ofApp::changeAssimpModel(int modelId){
             break;
         case 8:
             scale.set(ofVec3f(1.0, 1.0, 1.0));
-            assimpModelLoader.loadModel("models/momiji/momiji1/momiji.3ds", true);
+            assimpModelLoader.loadModel("models/maple/maple1/maple_orange.3ds", true);
             currentModelId = 8;
             break;
         default:
