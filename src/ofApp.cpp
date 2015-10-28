@@ -67,7 +67,7 @@ void ofApp::setup(){
     panel.add(cameraLookAt.set("cameraLookAt", ofVec3f(kinectWidth/2.0, kinectHeight/2.0, kinect.minDistance), ofVec3f(0, 0, -kinectDepth), ofVec3f(kinectWidth, kinectHeight, kinectDepth)));
     // world
     panel.add(modelStartPosition.set("modelStartPosition", ofVec3f(cameraPosition), cameraPosition.getMin(), cameraPosition.getMax()));
-    panel.add(worldGravity.set("worldGravity", ofVec3f(0, 0, 15.0), ofVec3f(-30, -30, -30), ofVec3f(30, 30, 30)));
+    panel.add(worldGravity.set("worldGravity", ofVec3f(0, 0, 15.0), ofVec3f(-100, -100, -100), ofVec3f(30, 30, 30)));
     panel.add(modelMass.set("modelMass", 0.000005, 0.000005, 1)); // 1 is 1 kg
     panel.add(enableAddModel.set("enableAddModel", false));
     panel.add(enableAddModelRandom.set("enableAddModelRandom", false));
@@ -96,6 +96,7 @@ void ofApp::setup(){
     // model
     ofVec3f scale(1.0, 1.0, 1.0);
     assimpModelLoader.loadModel("models/sakura/sakura2/sakura2.3ds", true);
+    currentModelId = 1;
     assimpModelLoader.setPosition(ofGetWidth()/2, ofGetHeight()/2, 0);
     assimpModelLoader.setScale(scale.x, scale.y, scale.z);
     ofQuaternion startRot = ofQuaternion(1., 0., 0., PI);
@@ -188,8 +189,11 @@ void ofApp::update(){
         texDepth.loadData(kinect.getDepthPixels());
         texRGB.loadData(kinect.getRgbPixels());
         rawDepthPixels = kinect.getRawDepthPixels();
-        
-        if (enableScanPeople) {
+        // bullet
+        if (kinectBulletShape == NULL ) {
+            updateKinectMesh();
+            setupWhenKinectIsReady();
+        }else if(enableScanPeople) {
             // scanning people feature
             if (!diffDepthTexture.isAllocated()) {
                 diffDepthTexture.allocate(rawDepthPixels.getWidth(), rawDepthPixels.getHeight(), GL_RGB);// color texture
@@ -239,10 +243,6 @@ void ofApp::update(){
             diffDepthTexture.loadData(diffDepthTexturePixels, rawDepthPixels.getWidth(), rawDepthPixels.getHeight(), GL_RGB);
         }else{
             updateKinectMesh();
-        }
-        // bullet
-        if (kinectBulletShape == NULL ) {
-            setupWhenKinectIsReady();
         }
     }
     
@@ -308,7 +308,35 @@ void ofApp::update(){
             ofVec3f frc(camera.getLookAtDir());
             frc.normalize();
             bulletCustomShape->applyCentralForce(frc*ofRandom(-0.01, 0.01));
-            ofVec3f instantTorque(ofRandom(-0.005, 0.005), ofRandom(-0.005, 0.005), ofRandom(-0.005, 0.005));
+            ofVec3f instantTorque;
+            switch (currentModelId) {
+                case 1:
+                    instantTorque.set(ofRandom(-0.005, 0.005), ofRandom(-0.005, 0.005), ofRandom(-0.005, 0.005));
+                    break;
+                case 2:
+                    instantTorque.set(ofRandom(-0.005, 0.005), ofRandom(-0.005, 0.005), ofRandom(-0.005, 0.005));
+                    break;
+                case 3:
+                    instantTorque.set(ofRandom(-0.005, 0.005), ofRandom(-0.005, 0.005), ofRandom(-0.005, 0.005));
+                    break;
+                case 4:
+                    instantTorque.set(ofRandom(-0.005, 0.005), ofRandom(-0.005, 0.005), ofRandom(-0.005, 0.005));
+                    break;
+                case 5:
+                    instantTorque.set(ofRandom(-0.0001, 0.0001), ofRandom(-0.0001, 0.0001), ofRandom(-0.0001, 0.0001));
+                    break;
+                case 6:
+                    instantTorque.set(ofRandom(-0.0001, 0.0001), ofRandom(-0.0001, 0.0001), ofRandom(-0.0001, 0.0001));
+                    break;
+                case 7:
+                    instantTorque.set(ofRandom(-0.005, 0.005), ofRandom(-0.005, 0.005), ofRandom(-0.005, 0.005));
+                    break;
+                case 8:
+                    instantTorque.set(ofRandom(-0.005, 0.005), ofRandom(-0.005, 0.005), ofRandom(-0.005, 0.005));
+                    break;
+                default:
+                    break;
+            }
             bulletCustomShape->applyTorque(instantTorque);
             assimpModelBulletShapes.push_back(bulletCustomShape);
         }
@@ -596,15 +624,39 @@ void ofApp::changeAssimpModel(int modelId){
     switch (modelId) {
         case 1:
             assimpModelLoader.loadModel("models/sakura/sakura2/sakura2.3ds", true);
+            currentModelId = 1;
             break;
         case 2:
             assimpModelLoader.loadModel("models/dna/dna2/dna.3ds", true);
+            currentModelId = 2;
             break;
         case 3:
             assimpModelLoader.loadModel("models/bitcoin/bitcoin1/bitcoin1.3ds", true);
+            currentModelId = 3;
             break;
         case 4:
             assimpModelLoader.loadModel("models/bitcoin/bitcoin3/one_sideBit_V01.3ds", true);
+            currentModelId = 4;
+            break;
+        case 5:
+            scale.set(ofVec3f(2.0, 2.0, 2.0));
+            assimpModelLoader.loadModel("models/dna/dna4/dna.3ds", true);
+            currentModelId = 5;
+            break;
+        case 6:
+            scale.set(ofVec3f(3.0, 3.0, 3.0));
+            assimpModelLoader.loadModel("models/dna/dna5/dna.3ds", true);
+            currentModelId = 6;
+            break;
+        case 7:
+            scale.set(ofVec3f(2.0, 2.0, 2.0));
+            assimpModelLoader.loadModel("models/bitcoin/bitcoin5/DGbitcoin_v01_0_180_235.3ds", true);
+            currentModelId = 7;
+            break;
+        case 8:
+            scale.set(ofVec3f(1.0, 1.0, 1.0));
+            assimpModelLoader.loadModel("models/momiji/momiji1/momiji.3ds", true);
+            currentModelId = 8;
             break;
         default:
             break;
@@ -660,9 +712,29 @@ void ofApp::keyPressed(int key){
             changeAssimpModel(3);
             break;
         case '4':
-            // test model
+            // test model: bitcoin with wireframe texture
             enableDrawAssimpModelWireFrame = false;
             changeAssimpModel(4);
+            break;
+        case '5':
+            // test model: dna with blue green texture
+            enableDrawAssimpModelWireFrame = false;
+            changeAssimpModel(5);
+            break;
+        case '6':
+            // test model: dna with light blue texture
+            enableDrawAssimpModelWireFrame = false;
+            changeAssimpModel(6);
+            break;
+        case '7':
+            // test model: bitcoin with white B and wireframe texture
+            enableDrawAssimpModelWireFrame = false;
+            changeAssimpModel(7);
+            break;
+        case '8':
+            // test model: bitcoin with white B and wireframe texture
+            enableDrawAssimpModelWireFrame = false;
+            changeAssimpModel(8);
             break;
         case 'f':
             ofToggleFullscreen();

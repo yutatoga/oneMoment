@@ -35,4 +35,8 @@
 <DMX_Channel_1>127</DMX_Channel_1>
 <disableKinect>0</disableKinect>
 <DMX_Channel_2>127</DMX_Channel_2>
+<enableDrawKinectWireFrame>1</enableDrawKinectWireFrame>
+	<enableDrawAssimpModelWireFrame>0</enableDrawAssimpModelWireFrame>
+	<enableScanPeople>0</enableScanPeople>
+	<probabilityFactor>2.34e+07</probabilityFactor>
 </distance_in_mm>

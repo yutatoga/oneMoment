@@ -3,7 +3,7 @@
 #define DMX_CHANNEL_NUMBER 2
 #define TIMER_PER_SECONDS 10
 #define PROBABILITY_FACTOR_MIN_FACTOR 0.1
-#define PROBABILITY_FACTOR_MAX_FACTOR 1000
+#define PROBABILITY_FACTOR_MAX_FACTOR 10000
 
 #include "ofMain.h"
 #include "ofxKinectV2.h"
@@ -111,6 +111,7 @@ public:
     
     // 3d model
     ofxAssimpModelLoader assimpModelLoader;
+    int currentModelId;
     
     // bullet
     ofxBulletWorldRigid world;
