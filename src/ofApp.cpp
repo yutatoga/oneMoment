@@ -42,6 +42,7 @@ void ofApp::setup(){
     panel.add(probabilityFactor.set("probabilityFactor", kinect.maxDistance, 1*PROBABILITY_FACTOR_MIN_FACTOR, kinect.maxDistance.getMax()*PROBABILITY_FACTOR_MAX_FACTOR));
     panel.add(reset.setup("reset"));
     // - dmx
+    panel.add(enableDmx.set("enableDmx", false));
     for (int i = 0; i < DMX_CHANNEL_NUMBER; i++) {
         panel.add(dmxChannels[i].set("DMX Channel "+ofToString(i+1), 127, 0, 255));
     }
@@ -171,15 +172,17 @@ void ofApp::setupWhenKinectIsReady(){
 //--------------------------------------------------------------
 void ofApp::update(){
     // dmx
-    for (int i = 0; i < DMX_CHANNEL_NUMBER; i++) {
-        dmxChannels[i].set(tween.update());
-        dmx.setLevel(i+1, dmxChannels[i]);// be careful, dmx channel starts from 1, not 0.
-    }
-    dmx.update();
-    if ((int)ofGetElapsedTimef() % TIMER_PER_SECONDS == 0){
-        // FIXME: hard code and use same tween to each dmx channel
+    if (enableDmx) {
         for (int i = 0; i < DMX_CHANNEL_NUMBER; i++) {
-            doEase(dmxChannels[i], 10000, 0);
+            dmxChannels[i].set(tween.update());
+            dmx.setLevel(i+1, dmxChannels[i]);// be careful, dmx channel starts from 1, not 0.
+        }
+        dmx.update();
+        if ((int)ofGetElapsedTimef() % TIMER_PER_SECONDS == 0){
+            // FIXME: hard code and use same tween to each dmx channel
+            for (int i = 0; i < DMX_CHANNEL_NUMBER; i++) {
+                doEase(dmxChannels[i], 10000, 0);
+            }
         }
     }
     
@@ -296,7 +299,7 @@ void ofApp::update(){
     }
     if (enableScanPeople) {
         // add models in modelStartPositioins
-        ofLogNotice("modelStartPositions"+ofToString(modelStartPositions.size()));
+        // ofLogNotice("modelStartPositions"+ofToString(modelStartPositions.size()));
         for (int i = 0; i < modelStartPositions.size(); i++) {
             // add model in random x, random y and modelStartPosition.z
             ofxBulletCustomShape *bulletCustomShape;

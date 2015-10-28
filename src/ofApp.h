@@ -83,6 +83,7 @@ public:
     ofParameter<ofVec3f> modelStartPosition;
     ofParameter<float> modelMass;
     // - dmx
+    ofParameter<bool> enableDmx;
     ofParameter<int> dmxChannels[DMX_CHANNEL_NUMBER];
     // - scanning cloth or scanning people
     ofParameter<bool> enableScanPeople;
