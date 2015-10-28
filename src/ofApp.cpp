@@ -663,7 +663,7 @@ void ofApp::changeAssimpModel(int modelId){
             break;
         case 7:
             scale.set(ofVec3f(2.0, 2.0, 2.0));
-            assimpModelLoader.loadModel("models/bitcoin/bitcoin5/DGbitcoin_v01_0_180_235.3ds", true);
+            assimpModelLoader.loadModel("models/bitcoin/bitcoin5/DGbitcoin_v02_blue_0_180_235.3ds", true);
             currentModelId = 7;
             break;
         case 8:
