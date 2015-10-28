@@ -189,8 +189,10 @@ void ofApp::update(){
     // kinect
     kinect.update();
     if( kinect.isFrameNew() ){
-        texDepth.loadData(kinect.getDepthPixels());
-        texRGB.loadData(kinect.getRgbPixels());
+        if (showPanel) {
+            texDepth.loadData(kinect.getDepthPixels());
+            texRGB.loadData(kinect.getRgbPixels());
+        }
         rawDepthPixels = kinect.getRawDepthPixels();
         // bullet
         if (kinectBulletShape == NULL ) {
@@ -220,22 +222,28 @@ void ofApp::update(){
                             }
                             
                             // set diffDepthTexturePixels with red color
-                            diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+0] = ofMap(diffDepthPixelsPointer[rawDepthPixels.getWidth()*y+x],
-                                                                                                0, kinect.maxDistance-kinect.minDistance, 0, 255, true) ; // r
-                            diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+1] = 0; // g
-                            diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+2] = 0; // b
+                            if (showPanel) {
+                                diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+0] = ofMap(diffDepthPixelsPointer[rawDepthPixels.getWidth()*y+x],
+                                                                                                    0, kinect.maxDistance-kinect.minDistance, 0, 255, true) ; // r
+                                diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+1] = 0; // g
+                                diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+2] = 0; // b
+                            }
                         }else{
                             // set diffDepthTexturePixels with blue color
-                            diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+0] = 0; // r
-                            diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+1] = 0; // g
-                            diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+2] = ofMap(-1*diffDepthPixelsPointer[rawDepthPixels.getWidth()*y+x],
-                                                                                                0, kinect.maxDistance-kinect.minDistance, 0, 255, true); // b
+                            if (showPanel) {
+                                diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+0] = 0; // r
+                                diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+1] = 0; // g
+                                diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+2] = ofMap(-1*diffDepthPixelsPointer[rawDepthPixels.getWidth()*y+x],
+                                                                                                    0, kinect.maxDistance-kinect.minDistance, 0, 255, true); // b
+                            }
                         }
                     }else{
                         // black
-                        diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+0] = 0; // r
-                        diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+1] = 0; // g
-                        diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+2] = 0; // b
+                        if (showPanel) {
+                            diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+0] = 0; // r
+                            diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+1] = 0; // g
+                            diffDepthTexturePixels[(rawDepthPixels.getWidth()*y+x)*3+2] = 0; // b
+                        }
                     }
                 }
             }
@@ -243,7 +251,9 @@ void ofApp::update(){
             // diffDepthTexture.loadData(diffDepthPixels);
             
             // draw RGB diff texture
-            diffDepthTexture.loadData(diffDepthTexturePixels, rawDepthPixels.getWidth(), rawDepthPixels.getHeight(), GL_RGB);
+            if (showPanel) {
+                diffDepthTexture.loadData(diffDepthTexturePixels, rawDepthPixels.getWidth(), rawDepthPixels.getHeight(), GL_RGB);                
+            }
         }else{
             updateKinectMesh();
         }
