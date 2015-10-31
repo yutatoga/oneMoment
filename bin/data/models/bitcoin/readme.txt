@@ -12,3 +12,6 @@ bitcoin4
 
 bitcoin5
 	bitcoin model with texture which looks like wireframe and has filled ‘DG’ mark. There are four colors texture which are white, deep blue, blue, and light blue. This is designed by Mako Ueda ( http://www.makoueda.com/ )
+
+bitcoin6
+	lower polygon of bitcoin5. This is designed by Mako Ueda ( http://www.makoueda.com/ )
