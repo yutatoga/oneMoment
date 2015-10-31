@@ -485,6 +485,7 @@ void ofApp::draw(){
                                 for (int i = 0; i < assimpModelBulletShapes.size(); i++) {
                                     assimpModelBulletShapes[i]->transformGL();{
                                         ofScale(scale.x, scale.y, scale.z);
+                                        // FIXME: problem is drawing same assimpmodel here
                                         enableDrawAssimpModelWireFrame ? assimpModelLoader.getCurrentAnimatedMesh(0).drawWireframe() : assimpModelLoader.getCurrentAnimatedMesh(0).drawFaces();
                                     } assimpModelBulletShapes[i]->restoreTransformGL();
                                 }
@@ -667,7 +668,7 @@ void ofApp::changeAssimpModel(int modelId){
             currentModelId = 7;
             break;
         case 8:
-            scale.set(ofVec3f(1.0, 1.0, 1.0));
+            scale.set(ofVec3f(0.65, 0.65, 0.65));
             assimpModelLoader.loadModel("models/maple/maple1/maple_orange.3ds", true);
             currentModelId = 8;
             break;
@@ -687,6 +688,7 @@ void ofApp::changeAssimpModel(int modelId){
                 assimpModelBulletShapes[i]->addMesh(assimpModelLoader.getMesh(j), scale, true);
             }
         } else {
+            // FIXME: problem is applying SAME assimp model to all assimpModelBulletShapes here
             assimpModelBulletShapes[i]->init((btCompoundShape*)assimpModelBulletShapes[0]->getCollisionShape(), assimpModelBulletShapes[0]->getCentroid());
         }
         ofVec3f startLoc = ofVec3f( ofRandom(-5, 5), ofRandom(0, -10), ofRandom(-5, 5) );
