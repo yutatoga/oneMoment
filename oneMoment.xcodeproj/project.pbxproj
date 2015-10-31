@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B26A076B1BE52BCF00CAC09F /* ofxSimpleTimer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B26A07691BE52BCF00CAC09F /* ofxSimpleTimer.cpp */; };
 		B29B12921BC41AB900C01E2F /* ofxDmx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B29B12901BC41AB900C01E2F /* ofxDmx.cpp */; };
 		B29B13531BC42D3800C01E2F /* ofxEasing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B29B13391BC42D3800C01E2F /* ofxEasing.cpp */; };
 		B29B13541BC42D3800C01E2F /* ofxEasingBack.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B29B133B1BC42D3800C01E2F /* ofxEasingBack.cpp */; };
@@ -285,6 +286,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		B26A07691BE52BCF00CAC09F /* ofxSimpleTimer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ofxSimpleTimer.cpp; sourceTree = "<group>"; };
+		B26A076A1BE52BCF00CAC09F /* ofxSimpleTimer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ofxSimpleTimer.h; sourceTree = "<group>"; };
 		B29B12901BC41AB900C01E2F /* ofxDmx.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ofxDmx.cpp; sourceTree = "<group>"; };
 		B29B12911BC41AB900C01E2F /* ofxDmx.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ofxDmx.h; sourceTree = "<group>"; };
 		B29B13381BC42D3800C01E2F /* easing_terms_of_use.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = easing_terms_of_use.html; sourceTree = "<group>"; };
@@ -1045,6 +1048,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		B26A07671BE52BCF00CAC09F /* ofxSimpleTimer */ = {
+			isa = PBXGroup;
+			children = (
+				B26A07681BE52BCF00CAC09F /* src */,
+			);
+			name = ofxSimpleTimer;
+			sourceTree = "<group>";
+		};
+		B26A07681BE52BCF00CAC09F /* src */ = {
+			isa = PBXGroup;
+			children = (
+				B26A07691BE52BCF00CAC09F /* ofxSimpleTimer.cpp */,
+				B26A076A1BE52BCF00CAC09F /* ofxSimpleTimer.h */,
+			);
+			name = src;
+			path = ../../../addons/ofxSimpleTimer/src;
+			sourceTree = "<group>";
+		};
 		B29B128E1BC41AB900C01E2F /* ofxDmx */ = {
 			isa = PBXGroup;
 			children = (
@@ -2482,6 +2503,7 @@
 				B2E636801BC28C750031BEBD /* ofxXmlSettings */,
 				B29B128E1BC41AB900C01E2F /* ofxDmx */,
 				B29B13351BC42D3800C01E2F /* ofxTween */,
+				B26A07671BE52BCF00CAC09F /* ofxSimpleTimer */,
 			);
 			name = addons;
 			sourceTree = "<group>";
@@ -2686,6 +2708,7 @@
 				B2E6355E1BC28C400031BEBD /* btSequentialImpulseConstraintSolver.cpp in Sources */,
 				B2E634FF1BC28C400031BEBD /* btSimpleBroadphase.cpp in Sources */,
 				B2E635461BC28C400031BEBD /* gim_memory.cpp in Sources */,
+				B26A076B1BE52BCF00CAC09F /* ofxSimpleTimer.cpp in Sources */,
 				B2E6353F1BC28C400031BEBD /* btGImpactBvh.cpp in Sources */,
 				B2E635111BC28C400031BEBD /* btInternalEdgeUtility.cpp in Sources */,
 				B29B13531BC42D3800C01E2F /* ofxEasing.cpp in Sources */,

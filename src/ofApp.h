@@ -1,7 +1,9 @@
 #pragma once
 
 #define DMX_CHANNEL_NUMBER 2
-#define TIMER_PER_SECONDS 10
+#define DMX_TIMER_PER_SECONDS 10
+#define MODEL_CHANGE_PER_SECONDS 180
+#define MODEL_NUMBER 8
 #define PROBABILITY_FACTOR_MIN_FACTOR 0.1
 #define PROBABILITY_FACTOR_MAX_FACTOR 10000
 
@@ -13,6 +15,7 @@
 #include "ofxAssimpModelLoader.h"
 #include "ofxDmx.h"
 #include "ofxTween.h"
+#include "ofxSimpleTimer.h"
 
 class ofApp : public ofBaseApp{
     
@@ -41,6 +44,7 @@ public:
     void enableSmoothLightingChanged(bool &enableSmoothLightingStatus);
     void enableScanPeopleChanged(bool &enableScanPeople);
     void saveReferenceDepthPixelsPressed();
+    void timerComplete(string &name);
     
     // gui
     ofxPanel panel;
@@ -133,6 +137,9 @@ public:
     // tween
     ofxTween tween;
     ofxEasingSine easingSine;
+    
+    // timer
+    ofxSimpleTimer timer;
     
     // debug
     // - debug spheres

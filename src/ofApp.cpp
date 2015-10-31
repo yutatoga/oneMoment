@@ -20,6 +20,7 @@ void ofApp::setup(){
     enableSmoothLighting.addListener(this, &ofApp::enableSmoothLightingChanged);
     enableScanPeople.addListener(this, &ofApp::enableScanPeopleChanged);
     saveReferenceDepthPixels.addListener(this, &ofApp::saveReferenceDepthPixelsPressed);
+    ofAddListener(ofxSimpleTimer::TIMER_COMPLETE, this, &ofApp::timerComplete);
     
     // gui
     showPanel = true;
@@ -125,6 +126,11 @@ void ofApp::setup(){
     light.setPosition(lightPosition);
     light.setPointLight();
     
+    // timer
+    timer.setName("changeModel");
+    timer.setTime(MODEL_CHANGE_PER_SECONDS*1000, 0); // infinity loop
+    timer.start();
+    
     // debug
     ofSetVerticalSync(false);
     ofSetFrameRate(0);
@@ -171,6 +177,9 @@ void ofApp::setupWhenKinectIsReady(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
+    // timer update
+    timer.update();
+    
     // dmx
     if (enableDmx) {
         for (int i = 0; i < DMX_CHANNEL_NUMBER; i++) {
@@ -178,7 +187,7 @@ void ofApp::update(){
             dmx.setLevel(i+1, dmxChannels[i]);// be careful, dmx channel starts from 1, not 0.
         }
         dmx.update();
-        if ((int)ofGetElapsedTimef() % TIMER_PER_SECONDS == 0){
+        if ((int)ofGetElapsedTimef() % DMX_TIMER_PER_SECONDS == 0){
             // FIXME: hard code and use same tween to each dmx channel
             for (int i = 0; i < DMX_CHANNEL_NUMBER; i++) {
                 doEase(dmxChannels[i], 10000, 0);
@@ -611,6 +620,69 @@ void ofApp::enableScanPeopleChanged(bool &enableScanPeople){
 void ofApp::saveReferenceDepthPixelsPressed(){
     savedReferenceDepthPixels = kinect.getRawDepthPixels();
     savedReferenceDepthTexture.loadData(kinect.getDepthPixels()); // be careful, this is NOT raw depth pixels
+}
+
+void ofApp::timerComplete(string &name){
+    ofLogNotice("timerComplete");
+    int currentCount = timer.getLoopCurrentCount();
+    int totalCount = timer.getLoopTotalCount();
+    
+    if(name=="changeModel"){
+        if(currentCount==totalCount){
+            cout << currentCount << "/" << totalCount << endl;
+            cout << "*** Complete ***" << endl;
+            
+            ++currentModelId %= MODEL_NUMBER;
+            switch (currentModelId+1) {
+                case 1:
+                    // sakura
+                    enableDrawAssimpModelWireFrame = false;
+                    changeAssimpModel(1);
+                    break;
+                case 2:
+                    // dna
+                    enableDrawAssimpModelWireFrame = false;
+                    changeAssimpModel(2);
+                    break;
+                case 3:
+                    // bitcoin
+                    enableDrawAssimpModelWireFrame = true;
+                    changeAssimpModel(3);
+                    break;
+                case 4:
+                    // test model: bitcoin with wireframe texture
+                    enableDrawAssimpModelWireFrame = false;
+                    changeAssimpModel(4);
+                    break;
+                case 5:
+                    // test model: dna with blue green texture
+                    enableDrawAssimpModelWireFrame = false;
+                    changeAssimpModel(5);
+                    break;
+                case 6:
+                    // test model: dna with light blue texture
+                    enableDrawAssimpModelWireFrame = false;
+                    changeAssimpModel(6);
+                    break;
+                case 7:
+                    // test model: bitcoin with white B and wireframe texture
+                    enableDrawAssimpModelWireFrame = false;
+                    changeAssimpModel(7);
+                    break;
+                case 8:
+                    // test model: bitcoin with white B and wireframe texture
+                    enableDrawAssimpModelWireFrame = false;
+                    changeAssimpModel(8);
+                    break;
+                default:
+                    break;
+            }
+        }else{
+            cout << currentCount << "/" << totalCount << endl;
+        }
+    }else{
+        // ignore
+    }
 }
 
 void ofApp::doEase(ofParameter<int> dmxChannel, unsigned duration, unsigned delay){
