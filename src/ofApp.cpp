@@ -654,17 +654,17 @@ void ofApp::changeAssimpModel(int modelId){
             break;
         case 5:
             scale.set(ofVec3f(2.0, 2.0, 2.0));
-            assimpModelLoader.loadModel("models/dna/dna4/dna.3ds", true);
+            assimpModelLoader.loadModel("models/dna/dna6/dna_low_green.3ds", true);
             currentModelId = 5;
             break;
         case 6:
             scale.set(ofVec3f(3.0, 3.0, 3.0));
-            assimpModelLoader.loadModel("models/dna/dna5/dna.3ds", true);
+            assimpModelLoader.loadModel("models/dna/dna6/dna_low_blue.3ds", true);
             currentModelId = 6;
             break;
         case 7:
             scale.set(ofVec3f(2.0, 2.0, 2.0));
-            assimpModelLoader.loadModel("models/bitcoin/bitcoin5/DGbitcoin_v02_blue_0_180_235.3ds", true);
+            assimpModelLoader.loadModel("models/bitcoin/bitcoin6/DGbitcoin_low_blue_0_180_235.3ds", true);
             currentModelId = 7;
             break;
         case 8:
