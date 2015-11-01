@@ -98,7 +98,7 @@ void ofApp::setup(){
     // model
     ofVec3f scale(1.0, 1.0, 1.0);
     assimpModelLoader.loadModel("models/sakura/sakura2/sakura2.3ds", true);
-    currentModelId = 1;
+    currentModelId = 0;
     assimpModelLoader.setPosition(ofGetWidth()/2, ofGetHeight()/2, 0);
     assimpModelLoader.setScale(scale.x, scale.y, scale.z);
     ofQuaternion startRot = ofQuaternion(1., 0., 0., PI);
@@ -332,28 +332,19 @@ void ofApp::update(){
             bulletCustomShape->applyCentralForce(frc*ofRandom(-0.01, 0.01));
             ofVec3f instantTorque;
             switch (currentModelId) {
+                case 0:
+                    instantTorque.set(ofRandom(-0.005, 0.005), ofRandom(-0.005, 0.005), ofRandom(-0.005, 0.005));
+                    break;
                 case 1:
                     instantTorque.set(ofRandom(-0.005, 0.005), ofRandom(-0.005, 0.005), ofRandom(-0.005, 0.005));
                     break;
                 case 2:
-                    instantTorque.set(ofRandom(-0.005, 0.005), ofRandom(-0.005, 0.005), ofRandom(-0.005, 0.005));
+                    instantTorque.set(ofRandom(-0.0001, 0.0001), ofRandom(-0.0001, 0.0001), ofRandom(-0.0001, 0.0001));
                     break;
                 case 3:
                     instantTorque.set(ofRandom(-0.005, 0.005), ofRandom(-0.005, 0.005), ofRandom(-0.005, 0.005));
                     break;
                 case 4:
-                    instantTorque.set(ofRandom(-0.005, 0.005), ofRandom(-0.005, 0.005), ofRandom(-0.005, 0.005));
-                    break;
-                case 5:
-                    instantTorque.set(ofRandom(-0.0001, 0.0001), ofRandom(-0.0001, 0.0001), ofRandom(-0.0001, 0.0001));
-                    break;
-                case 6:
-                    instantTorque.set(ofRandom(-0.0001, 0.0001), ofRandom(-0.0001, 0.0001), ofRandom(-0.0001, 0.0001));
-                    break;
-                case 7:
-                    instantTorque.set(ofRandom(-0.005, 0.005), ofRandom(-0.005, 0.005), ofRandom(-0.005, 0.005));
-                    break;
-                case 8:
                     instantTorque.set(ofRandom(-0.005, 0.005), ofRandom(-0.005, 0.005), ofRandom(-0.005, 0.005));
                     break;
                 default:
@@ -581,10 +572,13 @@ void ofApp::draw(){
     
     // info about shortcut keys
     if (showPanel) {
-        ofDrawBitmapStringHighlight("press f: toggle full screen", ofGetWidth()-225, ofGetHeight()-90, ofColor::white, ofColor::black);
-        ofDrawBitmapStringHighlight("press h: hide/show GUI     ", ofGetWidth()-225, ofGetHeight()-70, ofColor::white, ofColor::black);
-        ofDrawBitmapStringHighlight("press 1: load sakura model ", ofGetWidth()-225, ofGetHeight()-50, ofColor::white, ofColor::black);
-        ofDrawBitmapStringHighlight("press 2: load DNA model    ", ofGetWidth()-225, ofGetHeight()-30, ofColor::white, ofColor::black);
+        ofDrawBitmapStringHighlight("press f: toggle full screen", ofGetWidth()-225, ofGetHeight()-150, ofColor::white, ofColor::black);
+        ofDrawBitmapStringHighlight("press h: hide/show GUI     ", ofGetWidth()-225, ofGetHeight()-130, ofColor::white, ofColor::black);
+        ofDrawBitmapStringHighlight("press 0: load sakura model ", ofGetWidth()-225, ofGetHeight()-110, ofColor::white, ofColor::black);
+        ofDrawBitmapStringHighlight("press 1: load bitcoin model    ", ofGetWidth()-225, ofGetHeight()-90, ofColor::white, ofColor::black);
+        ofDrawBitmapStringHighlight("press 2: load DNA model    ", ofGetWidth()-225, ofGetHeight()-70, ofColor::white, ofColor::black);
+        ofDrawBitmapStringHighlight("press 3: load dgcoin model    ", ofGetWidth()-225, ofGetHeight()-50, ofColor::white, ofColor::black);
+        ofDrawBitmapStringHighlight("press 4: load maple model    ", ofGetWidth()-225, ofGetHeight()-30, ofColor::white, ofColor::black);
         ofDrawBitmapStringHighlight("press w: apply force       ", ofGetWidth()-225, ofGetHeight()-10, ofColor::white, ofColor::black);
     }
 }
@@ -643,9 +637,14 @@ void ofApp::timerComplete(string &name){
             cout << "*** Complete ***" << endl;
             
             ++currentModelId %= MODEL_NUMBER;
-            switch (currentModelId+1) {
-                case 1:
+            switch (currentModelId) {
+                case 0:
                     // sakura
+                    enableDrawAssimpModelWireFrame = false;
+                    changeAssimpModel(0);
+                    break;
+                case 1:
+                    // bitcoin
                     enableDrawAssimpModelWireFrame = false;
                     changeAssimpModel(1);
                     break;
@@ -655,34 +654,14 @@ void ofApp::timerComplete(string &name){
                     changeAssimpModel(2);
                     break;
                 case 3:
-                    // bitcoin
-                    enableDrawAssimpModelWireFrame = true;
+                    // dgcoin
+                    enableDrawAssimpModelWireFrame = false;
                     changeAssimpModel(3);
                     break;
                 case 4:
-                    // test model: bitcoin with wireframe texture
+                    // maple
                     enableDrawAssimpModelWireFrame = false;
                     changeAssimpModel(4);
-                    break;
-                case 5:
-                    // test model: dna with blue green texture
-                    enableDrawAssimpModelWireFrame = false;
-                    changeAssimpModel(5);
-                    break;
-                case 6:
-                    // test model: dna with light blue texture
-                    enableDrawAssimpModelWireFrame = false;
-                    changeAssimpModel(6);
-                    break;
-                case 7:
-                    // test model: bitcoin with white B and wireframe texture
-                    enableDrawAssimpModelWireFrame = false;
-                    changeAssimpModel(7);
-                    break;
-                case 8:
-                    // test model: bitcoin with white B and wireframe texture
-                    enableDrawAssimpModelWireFrame = false;
-                    changeAssimpModel(8);
                     break;
                 default:
                     break;
@@ -722,41 +701,33 @@ void ofApp::changeAssimpModel(int modelId){
     assimpModelLoader.clear();
     // select model by modelId
     switch (modelId) {
-        case 1:
+        case 0:
+            // sakura
             assimpModelLoader.loadModel("models/sakura/sakura2/sakura2.3ds", true);
+            currentModelId = 0;
+            break;
+        case 1:
+            // bitcoin
+            assimpModelLoader.loadModel("models/bitcoin/bitcoin4/bitcoin_v02.3ds", true);
             currentModelId = 1;
             break;
         case 2:
-            assimpModelLoader.loadModel("models/dna/dna2/dna.3ds", true);
+            // dna
+            scale.set(ofVec3f(2.0, 2.0, 2.0));
+            assimpModelLoader.loadModel("models/dna/dna6/dna_low_green.3ds", true);
             currentModelId = 2;
             break;
         case 3:
-            assimpModelLoader.loadModel("models/bitcoin/bitcoin1/bitcoin1.3ds", true);
+            // dgcoin
+            scale.set(ofVec3f(2.0, 2.0, 2.0));
+            assimpModelLoader.loadModel("models/bitcoin/bitcoin6/DGbitcoin_low_blue_0_180_235.3ds", true);
             currentModelId = 3;
             break;
         case 4:
-            assimpModelLoader.loadModel("models/bitcoin/bitcoin3/one_sideBit_V01.3ds", true);
-            currentModelId = 4;
-            break;
-        case 5:
-            scale.set(ofVec3f(2.0, 2.0, 2.0));
-            assimpModelLoader.loadModel("models/dna/dna6/dna_low_green.3ds", true);
-            currentModelId = 5;
-            break;
-        case 6:
-            scale.set(ofVec3f(3.0, 3.0, 3.0));
-            assimpModelLoader.loadModel("models/dna/dna6/dna_low_blue.3ds", true);
-            currentModelId = 6;
-            break;
-        case 7:
-            scale.set(ofVec3f(2.0, 2.0, 2.0));
-            assimpModelLoader.loadModel("models/bitcoin/bitcoin6/DGbitcoin_low_blue_0_180_235.3ds", true);
-            currentModelId = 7;
-            break;
-        case 8:
+            // maple
             scale.set(ofVec3f(0.65, 0.65, 0.65));
             assimpModelLoader.loadModel("models/maple/maple1/maple_orange.3ds", true);
-            currentModelId = 8;
+            currentModelId = 4;
             break;
         default:
             break;
@@ -797,8 +768,13 @@ void ofApp::keyPressed(int key){
             spheres.push_back( ss );
         }
             break;
-        case '1':
+        case '0':
             // sakura
+            enableDrawAssimpModelWireFrame = false;
+            changeAssimpModel(0);
+            break;
+        case '1':
+            // bitcoin
             enableDrawAssimpModelWireFrame = false;
             changeAssimpModel(1);
             break;
@@ -808,34 +784,14 @@ void ofApp::keyPressed(int key){
             changeAssimpModel(2);
             break;
         case '3':
-            // bitcoin
-            enableDrawAssimpModelWireFrame = true;
+            // dgcoin
+            enableDrawAssimpModelWireFrame = false;
             changeAssimpModel(3);
             break;
         case '4':
-            // test model: bitcoin with wireframe texture
-            enableDrawAssimpModelWireFrame = false;
-            changeAssimpModel(4);
-            break;
-        case '5':
-            // test model: dna with blue green texture
+            // maple
             enableDrawAssimpModelWireFrame = false;
             changeAssimpModel(5);
-            break;
-        case '6':
-            // test model: dna with light blue texture
-            enableDrawAssimpModelWireFrame = false;
-            changeAssimpModel(6);
-            break;
-        case '7':
-            // test model: bitcoin with white B and wireframe texture
-            enableDrawAssimpModelWireFrame = false;
-            changeAssimpModel(7);
-            break;
-        case '8':
-            // test model: bitcoin with white B and wireframe texture
-            enableDrawAssimpModelWireFrame = false;
-            changeAssimpModel(8);
             break;
         case 'f':
             ofToggleFullscreen();
