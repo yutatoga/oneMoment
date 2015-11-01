@@ -127,8 +127,8 @@ void ofApp::setup(){
     light.setPointLight();
     
     // timer
-    timer.setName("changeModel");
-    timer.setTime(MODEL_CHANGE_PER_SECONDS*1000, 0); // infinity loop
+    timer.setName("play");
+    timer.setTime(MODEL_PLAY_SECONDS*1000, 1);
     timer.start();
     
     // debug
@@ -293,7 +293,7 @@ void ofApp::update(){
         bulletCustomShape->applyCentralForce(frc*0.005);
         assimpModelBulletShapes.push_back(bulletCustomShape);
     }
-    if (enableAddModelRandom) {
+    if (enableAddModelRandom && timer.getName() != "interval") {
         // add model in random x, random y and modelStartPosition.z
         ofxBulletCustomShape *bulletCustomShape;
         bulletCustomShape = new ofxBulletCustomShape;
@@ -627,7 +627,17 @@ void ofApp::timerComplete(string &name){
     int currentCount = timer.getLoopCurrentCount();
     int totalCount = timer.getLoopTotalCount();
     
-    if(name=="changeModel"){
+    if(name=="play"){
+        if(currentCount==totalCount){
+            cout << currentCount << "/" << totalCount << endl;
+            cout << "*** Complete ***" << endl;
+            timer.setName("interval");
+            timer.setTime(MODEL_INTERVAL_SECONDS*1000, 1);
+            timer.start();
+        }else{
+            cout << currentCount << "/" << totalCount << endl;
+        }
+    }else if("interval"){
         if(currentCount==totalCount){
             cout << currentCount << "/" << totalCount << endl;
             cout << "*** Complete ***" << endl;
@@ -677,6 +687,10 @@ void ofApp::timerComplete(string &name){
                 default:
                     break;
             }
+            
+            timer.setName("play");
+            timer.setTime(MODEL_PLAY_SECONDS*1000, 1);
+            timer.start();
         }else{
             cout << currentCount << "/" << totalCount << endl;
         }
