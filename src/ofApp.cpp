@@ -791,7 +791,7 @@ void ofApp::keyPressed(int key){
         case '4':
             // maple
             enableDrawAssimpModelWireFrame = false;
-            changeAssimpModel(5);
+            changeAssimpModel(4);
             break;
         case 'f':
             ofToggleFullscreen();
