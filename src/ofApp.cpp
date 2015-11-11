@@ -96,26 +96,52 @@ void ofApp::setup(){
     world.setGravity(worldGravity);
     
     // model
-    ofVec3f scale(1.0, 1.0, 1.0);
-    assimpModelLoader.loadModel("models/sakura/sakura2/sakura2.3ds", true);
-    currentModelId = 0;
-    assimpModelLoader.setPosition(ofGetWidth()/2, ofGetHeight()/2, 0);
-    assimpModelLoader.setScale(scale.x, scale.y, scale.z);
+    // assimpModelLoaders
+    // - sakura
+    assimpModelLoaders[0].loadModel("models/sakura/sakura2/sakura2.3ds", true);
+    assimpModelLoaders[0].setPosition(ofGetWidth()/2, ofGetHeight()/2, 0);
+    assimpModelLoaders[0].setScale(1.0, 1.0, 1.0);
+    // - bitcoin
+    assimpModelLoaders[1].loadModel("models/bitcoin/bitcoin4/bitcoin_v02.3ds", true);
+    assimpModelLoaders[1].setPosition(ofGetWidth()/2, ofGetHeight()/2, 0);
+    assimpModelLoaders[1].setScale(1.0, 1.0, 1.0);
+    // - dna
+    assimpModelLoaders[2].loadModel("models/dna/dna6/dna_low_green.3ds", true);
+    assimpModelLoaders[2].setPosition(ofGetWidth()/2, ofGetHeight()/2, 0);
+    assimpModelLoaders[2].setScale(2.0, 2.0, 2.0);
+    // - dgcoin
+    assimpModelLoaders[3].loadModel("models/bitcoin/bitcoin6/DGbitcoin_low_blue_0_180_235.3ds", true);
+    assimpModelLoaders[3].setPosition(ofGetWidth()/2, ofGetHeight()/2, 0);
+    assimpModelLoaders[3].setScale(2.0, 2.0, 2.0);
+    // - maple
+    assimpModelLoaders[4].loadModel("models/maple/maple1/maple_orange.3ds", true);
+    assimpModelLoaders[4].setPosition(ofGetWidth()/2, ofGetHeight()/2, 0);
+    assimpModelLoaders[4].setScale(0.65, 0.65, 0.65);
+    
+    // modelSetVector
+    modelSetVector.resize(4);
+    // - sakura
+    modelSetVector[0].push_back(0);
+    // - bitcoin & dgcoin
+    modelSetVector[1].push_back(1);
+    modelSetVector[1].push_back(3);
+    // - dna
+    modelSetVector[2].push_back(2);
+    // - maple
+    modelSetVector[3].push_back(4);
+    
+    // referenceAssimpModelBulletShapes
     ofQuaternion startRot = ofQuaternion(1., 0., 0., PI);
-    assimpModelBulletShapes.resize(3);
-    for (int i = 0; i < assimpModelBulletShapes.size(); i++) {
-        assimpModelBulletShapes[i] = new ofxBulletCustomShape;
-        if (i == 0) {
-            for (int j = 0; j < assimpModelLoader.getNumMeshes(); j++) {
-                assimpModelBulletShapes[i]->addMesh(assimpModelLoader.getMesh(j), scale, true);
-            }
-        } else {
-            assimpModelBulletShapes[i]->init((btCompoundShape*)assimpModelBulletShapes[0]->getCollisionShape(), assimpModelBulletShapes[0]->getCentroid());
+    for (int i = 0; i < MODEL_NUMBER; i++) {
+        for (int j = 0; j < assimpModelLoaders[i].getNumMeshes(); j++) {
+            referenceAssimpModelBulletShapes[i] = new ofxBulletCustomShape;
+            referenceAssimpModelBulletShapes[i]->addMesh(assimpModelLoaders[i].getMesh(j), assimpModelLoaders[i].getScale(), true);
+            ofVec3f startLoc = ofVec3f( ofRandom(-5, 5), ofRandom(0, -10), ofRandom(-5, 5) );
+            referenceAssimpModelBulletShapes[i]->create(world.world, startLoc, startRot, 3.);
+            referenceAssimpModelBulletShapes[i]->add();
         }
-        ofVec3f startLoc = ofVec3f( ofRandom(-5, 5), ofRandom(0, -10), ofRandom(-5, 5) );
-        assimpModelBulletShapes[i]->create(world.world, startLoc, startRot, 3.);
-        assimpModelBulletShapes[i]->add();
     }
+    currentModelSetId = 0;
     
     // light
     light.setSpecularColor(lightSpecularColor);
@@ -261,7 +287,7 @@ void ofApp::update(){
             
             // draw RGB diff texture
             if (showPanel) {
-                diffDepthTexture.loadData(diffDepthTexturePixels, rawDepthPixels.getWidth(), rawDepthPixels.getHeight(), GL_RGB);                
+                diffDepthTexture.loadData(diffDepthTexturePixels, rawDepthPixels.getWidth(), rawDepthPixels.getHeight(), GL_RGB);
             }
         }else{
             updateKinectMesh();
@@ -282,10 +308,11 @@ void ofApp::update(){
     // model
     if (enableAddModel) {
         // add model in modelStartPosition
-        ofxBulletCustomShape *bulletCustomShape;
-        bulletCustomShape = new ofxBulletCustomShape;
+        ofxBulletAssimpShape *bulletCustomShape;
+        bulletCustomShape = new ofxBulletAssimpShape(currentModelSetId, rand()%(int)modelSetVector[currentModelSetId].size());
         ofQuaternion startRot = ofQuaternion(1., 0., 0., PI);
-        bulletCustomShape->init((btCompoundShape*)assimpModelBulletShapes[0]->getCollisionShape(), assimpModelBulletShapes[0]->getCentroid());
+        int modelId = modelSetVector[bulletCustomShape->getSetId()][bulletCustomShape->getIndex()];
+        bulletCustomShape->init((btCompoundShape*)referenceAssimpModelBulletShapes[modelId]->getCollisionShape(), referenceAssimpModelBulletShapes[modelId]->getCentroid());
         bulletCustomShape->create(world.world, modelStartPosition, startRot, modelMass);
         bulletCustomShape->add();
         ofVec3f frc(camera.getLookAtDir());
@@ -295,16 +322,17 @@ void ofApp::update(){
     }
     if (enableAddModelRandom && timer.getName() != "interval") {
         // add model in random x, random y and modelStartPosition.z
-        ofxBulletCustomShape *bulletCustomShape;
-        bulletCustomShape = new ofxBulletCustomShape;
+        ofxBulletAssimpShape *bulletCustomShape;
+        bulletCustomShape = new ofxBulletAssimpShape(currentModelSetId, rand()%(int)modelSetVector[currentModelSetId].size());
         ofQuaternion startRot = ofQuaternion(ofRandom(0, 1), ofRandom(0, 1), ofRandom(0, 1), ofRandom(-1*PI, PI));
-        bulletCustomShape->init((btCompoundShape*)assimpModelBulletShapes[0]->getCollisionShape(), assimpModelBulletShapes[0]->getCentroid());
+        int modelId = modelSetVector[bulletCustomShape->getSetId()][bulletCustomShape->getIndex()];
+        bulletCustomShape->init((btCompoundShape*)referenceAssimpModelBulletShapes[modelId]->getCollisionShape(), referenceAssimpModelBulletShapes[modelId]->getCentroid());
         // random square
-//        ofVec3f instantModelStartPosition(ofRandom(0, w), ofRandom(0, h), modelStartPosition->z);
+        //        ofVec3f instantModelStartPosition(ofRandom(0, w), ofRandom(0, h), modelStartPosition->z);
         
         // random circle
         float instantRadius = ofRandom(0, 500);
-//        float instantRadius = (ofRandom(-500, 500)+ofRandom(-500, 500)+ofRandom(-500, 500)+ofRandom(-500, 500)+ofRandom(-500, 500))/5.0;
+        //        float instantRadius = (ofRandom(-500, 500)+ofRandom(-500, 500)+ofRandom(-500, 500)+ofRandom(-500, 500)+ofRandom(-500, 500))/5.0;
         float instantTheta = ofRandom(-PI, PI);
         ofVec3f instantModelStartPosition(kinectWidth/2.0+instantRadius*cos(instantTheta), kinectHeight/2.0+instantRadius*sin(instantTheta), modelStartPosition->z);
         bulletCustomShape->create(world.world, instantModelStartPosition, startRot, modelMass);
@@ -321,17 +349,18 @@ void ofApp::update(){
         // ofLogNotice("modelStartPositions"+ofToString(modelStartPositions.size()));
         for (int i = 0; i < modelStartPositions.size(); i++) {
             // add model in random x, random y and modelStartPosition.z
-            ofxBulletCustomShape *bulletCustomShape;
-            bulletCustomShape = new ofxBulletCustomShape;
+            ofxBulletAssimpShape *bulletCustomShape;
+            bulletCustomShape = new ofxBulletAssimpShape(currentModelSetId, rand()%(int)modelSetVector[currentModelSetId].size());
             ofQuaternion startRot = ofQuaternion(ofRandom(0, 1), ofRandom(0, 1), ofRandom(0, 1), ofRandom(-1*PI, PI));
-            bulletCustomShape->init((btCompoundShape*)assimpModelBulletShapes[0]->getCollisionShape(), assimpModelBulletShapes[0]->getCentroid());
+            int modelId = modelSetVector[currentModelSetId][rand()%(int)modelSetVector[currentModelSetId].size()];
+            bulletCustomShape->init((btCompoundShape*)referenceAssimpModelBulletShapes[modelId]->getCollisionShape(), referenceAssimpModelBulletShapes[modelId]->getCentroid());
             bulletCustomShape->create(world.world, modelStartPositions[i], startRot, modelMass);
             bulletCustomShape->add();
             ofVec3f frc(camera.getLookAtDir());
             frc.normalize();
             bulletCustomShape->applyCentralForce(frc*ofRandom(-0.01, 0.01));
             ofVec3f instantTorque;
-            switch (currentModelId) {
+            switch (currentModelSetId) {
                 case 0:
                     instantTorque.set(ofRandom(-0.005, 0.005), ofRandom(-0.005, 0.005), ofRandom(-0.005, 0.005));
                     break;
@@ -361,23 +390,20 @@ void ofApp::update(){
     
     ofRectangle kinectRange(0, 0, kinectWidth, kinectHeight);
     for( int i = 0; i < assimpModelBulletShapes.size(); i++ ) {
-        // FIXME: can not delete assimpModelBulletShapes[0] (maybe better to use shared_ptr. check ofxBullet>SoftBodyMeshExample)
-        if (i != 0) {
-            // erase model which is in out range(z < 0)
-            if(assimpModelBulletShapes[i]->getPosition().z < 0) {
-                assimpModelBulletShapes[i]->remove();
-                assimpModelBulletShapes.erase(assimpModelBulletShapes.begin() + i);
-                // erase only one bullet shape
-                // break;
-            }else if(kinectIsReady && kinectRange.inside(assimpModelBulletShapes[i]->getPosition().x, assimpModelBulletShapes[i]->getPosition().y)){
-                // apply force to bullet shape inside the
-                float instantKinectDepth = rawDepthPixels[(int)assimpModelBulletShapes[i]->getPosition().x + (int)assimpModelBulletShapes[i]->getPosition().y*kinectWidth];
-                if (instantKinectDepth > kinect.minDistance && instantKinectDepth < kinect.maxDistance && assimpModelBulletShapes[i]->getPosition().z > instantKinectDepth) {
-                    // add force to the model which is above the kinect mesh
-                    if (ofGetMousePressed()) {
-                        ofVec3f wind(0, 0, 0.001); // FIXME: hard code
-                        assimpModelBulletShapes[i]->applyCentralForce(wind);
-                    }
+        // erase model which is in out range(z < 0)
+        if(assimpModelBulletShapes[i]->getPosition().z < 0) {
+            assimpModelBulletShapes[i]->remove();
+            assimpModelBulletShapes.erase(assimpModelBulletShapes.begin() + i);
+            // erase only one bullet shape
+            // break;
+        }else if(kinectIsReady && kinectRange.inside(assimpModelBulletShapes[i]->getPosition().x, assimpModelBulletShapes[i]->getPosition().y)){
+            // apply force to bullet shape inside the
+            float instantKinectDepth = rawDepthPixels[(int)assimpModelBulletShapes[i]->getPosition().x + (int)assimpModelBulletShapes[i]->getPosition().y*kinectWidth];
+            if (instantKinectDepth > kinect.minDistance && instantKinectDepth < kinect.maxDistance && assimpModelBulletShapes[i]->getPosition().z > instantKinectDepth) {
+                // add force to the model which is above the kinect mesh
+                if (ofGetMousePressed()) {
+                    ofVec3f wind(0, 0, 0.001); // FIXME: hard code
+                    assimpModelBulletShapes[i]->applyCentralForce(wind);
                 }
             }
         }
@@ -477,20 +503,20 @@ void ofApp::draw(){
                         }
                         
                         // assimp models
-                        ofPoint scale = assimpModelLoader.getScale();
-                        ofxAssimpMeshHelper & meshHelper = assimpModelLoader.getMeshHelper(0);
-                        // ofMaterial & assimpModelMaterial = meshHelper.material;
-                        meshHelper.getTextureRef().bind();{
-                            // assimpModelMaterial.begin();{
-                                for (int i = 0; i < assimpModelBulletShapes.size(); i++) {
-                                    assimpModelBulletShapes[i]->transformGL();{
-                                        ofScale(scale.x, scale.y, scale.z);
-                                        // FIXME: problem is drawing same assimpmodel here
-                                        enableDrawAssimpModelWireFrame ? assimpModelLoader.getCurrentAnimatedMesh(0).drawWireframe() : assimpModelLoader.getCurrentAnimatedMesh(0).drawFaces();
-                                    } assimpModelBulletShapes[i]->restoreTransformGL();
-                                }
-                            // }assimpModelMaterial.end();
-                        }meshHelper.getTextureRef().unbind();
+                        for (int i = 0; i < assimpModelBulletShapes.size(); i++) {
+                            int assimpModelId = modelSetVector[assimpModelBulletShapes[i]->getSetId()][assimpModelBulletShapes[i]->getIndex()];
+                            ofPoint scale = assimpModelLoaders[assimpModelId].getScale();
+                            ofxAssimpMeshHelper & meshHelper = assimpModelLoaders[assimpModelId].getMeshHelper(0);
+                            // ofMaterial & assimpModelMaterial = meshHelper.material;
+                            meshHelper.getTextureRef().bind();{
+                                // assimpModelMaterial.begin();{
+                                assimpModelBulletShapes[i]->transformGL();{
+                                    ofScale(scale.x, scale.y, scale.z);
+                                    enableDrawAssimpModelWireFrame ? assimpModelLoaders[assimpModelId].getCurrentAnimatedMesh(0).drawWireframe() : assimpModelLoaders[assimpModelId].getCurrentAnimatedMesh(0).drawFaces();
+                                } assimpModelBulletShapes[i]->restoreTransformGL();
+                                // }assimpModelMaterial.end();
+                            }meshHelper.getTextureRef().unbind();
+                        }
                         
                         // debug
                         // - camera target
@@ -508,7 +534,7 @@ void ofApp::draw(){
                     }
                 }light.disable();
             }ofDisableLighting();
-             if(enableDrawDebug) ofDrawAxis(10000);
+            if(enableDrawDebug) ofDrawAxis(10000);
             // }ofPopMatrix();
         }camera.end();
     }ofDisableDepthTest();
@@ -521,7 +547,8 @@ void ofApp::draw(){
     // debug
     ofSetColor(255);
     // - fps
-    ofSetWindowTitle(ofToString(ofGetFrameRate(), 0));
+    ofSetWindowTitle(ofToString(ofGetFrameRate(), 0)+" assimpModelBulletShapes:"+ofToString((int)assimpModelBulletShapes.size(), 0));
+    
     // - center guide line
     if (enableDrawGuideLine) {
         ofSetColor(ofColor::lightBlue);
@@ -572,14 +599,13 @@ void ofApp::draw(){
     
     // info about shortcut keys
     if (showPanel) {
-        ofDrawBitmapStringHighlight("press f: toggle full screen", ofGetWidth()-225, ofGetHeight()-150, ofColor::white, ofColor::black);
-        ofDrawBitmapStringHighlight("press h: hide/show GUI     ", ofGetWidth()-225, ofGetHeight()-130, ofColor::white, ofColor::black);
-        ofDrawBitmapStringHighlight("press 0: load sakura model ", ofGetWidth()-225, ofGetHeight()-110, ofColor::white, ofColor::black);
-        ofDrawBitmapStringHighlight("press 1: load bitcoin model    ", ofGetWidth()-225, ofGetHeight()-90, ofColor::white, ofColor::black);
-        ofDrawBitmapStringHighlight("press 2: load DNA model    ", ofGetWidth()-225, ofGetHeight()-70, ofColor::white, ofColor::black);
-        ofDrawBitmapStringHighlight("press 3: load dgcoin model    ", ofGetWidth()-225, ofGetHeight()-50, ofColor::white, ofColor::black);
-        ofDrawBitmapStringHighlight("press 4: load maple model    ", ofGetWidth()-225, ofGetHeight()-30, ofColor::white, ofColor::black);
-        ofDrawBitmapStringHighlight("press w: apply force       ", ofGetWidth()-225, ofGetHeight()-10, ofColor::white, ofColor::black);
+        ofDrawBitmapStringHighlight("press f: toggle full screen         ", ofGetWidth()-300, ofGetHeight()-130, ofColor::white, ofColor::black);
+        ofDrawBitmapStringHighlight("press h: hide/show GUI              ", ofGetWidth()-300, ofGetHeight()-110, ofColor::white, ofColor::black);
+        ofDrawBitmapStringHighlight("press 0: load sakura model          ", ofGetWidth()-300, ofGetHeight()-90, ofColor::white, ofColor::black);
+        ofDrawBitmapStringHighlight("press 1: load bitcoin & dgcoin model", ofGetWidth()-300, ofGetHeight()-70, ofColor::white, ofColor::black);
+        ofDrawBitmapStringHighlight("press 2: load DNA model             ", ofGetWidth()-300, ofGetHeight()-50, ofColor::white, ofColor::black);
+        ofDrawBitmapStringHighlight("press 3: load maple model           ", ofGetWidth()-300, ofGetHeight()-30, ofColor::white, ofColor::black);
+        ofDrawBitmapStringHighlight("press w: apply force                ", ofGetWidth()-300, ofGetHeight()-10, ofColor::white, ofColor::black);
     }
 }
 
@@ -636,15 +662,15 @@ void ofApp::timerComplete(string &name){
             cout << currentCount << "/" << totalCount << endl;
             cout << "*** Complete ***" << endl;
             
-            ++currentModelId %= MODEL_NUMBER;
-            switch (currentModelId) {
+            ++currentModelSetId %= (int)modelSetVector.size();
+            switch (currentModelSetId) {
                 case 0:
                     // sakura
                     enableDrawAssimpModelWireFrame = false;
                     changeAssimpModel(0);
                     break;
                 case 1:
-                    // bitcoin
+                    // bitcoin & dgcoin
                     enableDrawAssimpModelWireFrame = false;
                     changeAssimpModel(1);
                     break;
@@ -654,14 +680,9 @@ void ofApp::timerComplete(string &name){
                     changeAssimpModel(2);
                     break;
                 case 3:
-                    // dgcoin
-                    enableDrawAssimpModelWireFrame = false;
-                    changeAssimpModel(3);
-                    break;
-                case 4:
                     // maple
                     enableDrawAssimpModelWireFrame = false;
-                    changeAssimpModel(4);
+                    changeAssimpModel(3);
                     break;
                 default:
                     break;
@@ -688,69 +709,33 @@ void ofApp::doEase(ofParameter<int> dmxChannel, unsigned duration, unsigned dela
     }
 }
 
-void ofApp::changeAssimpModel(int modelId){
-    ofLogNotice("reload assimp model: current model ID = "+ofToString(modelId));
-    
+void ofApp::changeAssimpModel(int modelSetId){
     // remove and clear all bullet shapees
     for (int i = 0; i < (int)assimpModelBulletShapes.size(); i++) {
         assimpModelBulletShapes[i]->remove();
     }
     assimpModelBulletShapes.clear();
     // clear assimp model
-    ofVec3f scale(1.0, 1.0, 1.0);
-    assimpModelLoader.clear();
     // select model by modelId
-    switch (modelId) {
+    switch (modelSetId) {
         case 0:
             // sakura
-            assimpModelLoader.loadModel("models/sakura/sakura2/sakura2.3ds", true);
-            currentModelId = 0;
+            currentModelSetId = 0;
             break;
         case 1:
-            // bitcoin
-            assimpModelLoader.loadModel("models/bitcoin/bitcoin4/bitcoin_v02.3ds", true);
-            currentModelId = 1;
+            // bitcoin & dgcoin
+            currentModelSetId = 1;
             break;
         case 2:
             // dna
-            scale.set(ofVec3f(2.0, 2.0, 2.0));
-            assimpModelLoader.loadModel("models/dna/dna6/dna_low_green.3ds", true);
-            currentModelId = 2;
+            currentModelSetId = 2;
             break;
         case 3:
-            // dgcoin
-            scale.set(ofVec3f(2.0, 2.0, 2.0));
-            assimpModelLoader.loadModel("models/bitcoin/bitcoin6/DGbitcoin_low_blue_0_180_235.3ds", true);
-            currentModelId = 3;
-            break;
-        case 4:
             // maple
-            scale.set(ofVec3f(0.65, 0.65, 0.65));
-            assimpModelLoader.loadModel("models/maple/maple1/maple_orange.3ds", true);
-            currentModelId = 4;
+            currentModelSetId = 3;
             break;
         default:
             break;
-    }
-    // set up new model and bullet
-    assimpModelLoader.setPosition(ofGetWidth()/2, ofGetHeight()/2, 0);
-    assimpModelLoader.setScale(scale.x, scale.y, scale.z);
-    assimpModelLoader.update();
-    ofQuaternion startRot = ofQuaternion(1., 0., 0., PI);
-    assimpModelBulletShapes.resize(3);
-    for (int i = 0; i < assimpModelBulletShapes.size(); i++) {
-        assimpModelBulletShapes[i] = new ofxBulletCustomShape;
-        if (i == 0) {
-            for (int j = 0; j < assimpModelLoader.getNumMeshes(); j++) {
-                assimpModelBulletShapes[i]->addMesh(assimpModelLoader.getMesh(j), scale, true);
-            }
-        } else {
-            // FIXME: problem is applying SAME assimp model to all assimpModelBulletShapes here
-            assimpModelBulletShapes[i]->init((btCompoundShape*)assimpModelBulletShapes[0]->getCollisionShape(), assimpModelBulletShapes[0]->getCentroid());
-        }
-        ofVec3f startLoc = ofVec3f( ofRandom(-5, 5), ofRandom(0, -10), ofRandom(-5, 5) );
-        assimpModelBulletShapes[i]->create(world.world, startLoc, startRot, 3.);
-        assimpModelBulletShapes[i]->add();
     }
 }
 
@@ -760,11 +745,11 @@ void ofApp::keyPressed(int key){
         case ' ':{
             // add one sphere
             shared_ptr< ofxBulletSphere > ss( new ofxBulletSphere() );
-            ss->create( world.world, camera.getPosition()+100.0f*camera.getLookAtDir(), 0.0000051, 30.0);
+            ss->create( world.world, camera.getPosition()+100.0f*camera.getLookAtDir(), 0.05, 30.0);
             ss->add();
             ofVec3f frc(camera.getLookAtDir());
             frc.normalize();
-            // ss->applyCentralForce(frc*0.01);
+            ss->applyCentralForce(frc*1000);
             spheres.push_back( ss );
         }
             break;
@@ -774,7 +759,7 @@ void ofApp::keyPressed(int key){
             changeAssimpModel(0);
             break;
         case '1':
-            // bitcoin
+            // bitcoin & dgcoin
             enableDrawAssimpModelWireFrame = false;
             changeAssimpModel(1);
             break;
@@ -784,14 +769,9 @@ void ofApp::keyPressed(int key){
             changeAssimpModel(2);
             break;
         case '3':
-            // dgcoin
-            enableDrawAssimpModelWireFrame = false;
-            changeAssimpModel(3);
-            break;
-        case '4':
             // maple
             enableDrawAssimpModelWireFrame = false;
-            changeAssimpModel(4);
+            changeAssimpModel(3);
             break;
         case 'f':
             ofToggleFullscreen();
@@ -799,14 +779,14 @@ void ofApp::keyPressed(int key){
         case 'h':
             // show/hide gui panel
             showPanel = !showPanel;
-
+            
             // show/hide mouse cursor
             showPanel ? ofShowCursor() : ofHideCursor();
             break;
         case 'm':{
             // add model
-            ofxBulletCustomShape *bulletCustomShape;
-            bulletCustomShape = new ofxBulletCustomShape;
+            ofxBulletAssimpShape *bulletCustomShape;
+            bulletCustomShape = new ofxBulletAssimpShape;
             ofQuaternion startRot = ofQuaternion(1., 0., 0., PI);
             bulletCustomShape->init((btCompoundShape*)assimpModelBulletShapes[0]->getCollisionShape(), assimpModelBulletShapes[0]->getCentroid());
             bulletCustomShape->create(world.world, modelStartPosition, startRot, modelMass);
@@ -846,7 +826,7 @@ void ofApp::mouseDragged(int x, int y, int button){
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
-
+    
 }
 
 //--------------------------------------------------------------

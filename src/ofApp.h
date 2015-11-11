@@ -17,6 +17,7 @@
 #include "ofxDmx.h"
 #include "ofxTween.h"
 #include "ofxSimpleTimer.h"
+#include "ofxBulletAssimpShape.h"
 
 class ofApp : public ofBaseApp{
     
@@ -38,7 +39,7 @@ public:
     void setupWhenKinectIsReady();
     bool valueIsInKinectRange(float value);
     void doEase(ofParameter<int> dmxChannel, unsigned duration, unsigned delay);
-    void changeAssimpModel(int modelId);
+    void changeAssimpModel(int modelSetId);
     void updateKinectMesh();
     // listener
     void resetPressed();
@@ -50,7 +51,7 @@ public:
     // gui
     ofxPanel panel;
     bool showPanel;
-
+    
     //- kinect
     ofParameter<int> step;
     ofParameter<bool> stopUpdatingKinectBullet;
@@ -116,14 +117,16 @@ public:
     ofEasyCam camera;
     
     // 3d model
-    ofxAssimpModelLoader assimpModelLoader;
-    int currentModelId;
+    int currentModelSetId;
+    ofxAssimpModelLoader assimpModelLoaders[MODEL_NUMBER];
+    vector<vector<int> > modelSetVector;
     
     // bullet
     ofxBulletWorldRigid world;
     shared_ptr<ofxBulletTriMeshShape> kinectBulletShape;
     vector<shared_ptr<ofxBulletSphere> > spheres;
-    vector<ofxBulletCustomShape*> assimpModelBulletShapes;
+    vector<ofxBulletAssimpShape*> assimpModelBulletShapes;
+    ofxBulletCustomShape* referenceAssimpModelBulletShapes[MODEL_NUMBER];
     vector<ofVec3f> modelStartPositions;
     
     // light
